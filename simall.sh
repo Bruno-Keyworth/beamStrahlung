@@ -7,6 +7,8 @@
 
 source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
+detDirVicKekWorkServer="$HOME/promotion/code/k4geo/FCCee/ILD_FCCee/compact"
+
 for idet in {8..10}; do # detector models
 
     if (( $idet == 0 )); then
@@ -51,15 +53,15 @@ for idet in {8..10}; do # detector models
 
     elif (( $idet == 8 )); then
         ddsimfile=keep_microcurlers_10MeV_30mrad
-        detdir=/home/ilc/jeans/k4geo_GH/FCCee/ILD_FCCee/compact ; detmod=ILD_FCCee_v01 # ILD_FCCee_v01, uniform field
+        detdir=${detDirVicKekWorkServer}; detmod=ILD_FCCee_v01 # ILD_FCCee_v01, uniform field
 
     elif (( $idet == 9 )); then
         ddsimfile=keep_microcurlers_10MeV_30mrad
-        detdir=/home/ilc/jeans/k4geo_GH/FCCee/ILD_FCCee/compact ; detmod=ILD_FCCee_v01_field # ILD_FCCee_v01, field map
+        detdir=${detDirVicKekWorkServer}; detmod=ILD_FCCee_v01_fields # ILD_FCCee_v01, field map
 
     elif (( $idet == 10 )); then
         ddsimfile=keep_microcurlers_10MeV_30mrad
-        detdir=/home/ilc/jeans/k4geo_GH/FCCee/ILD_FCCee/compact ; detmod=ILD_FCCee_v01_field_nomask # ILD_FCCee_v01, field map, no shielding
+        detdir=${detDirVicKekWorkServer}; detmod=ILD_FCCee_v01_fields_noMask # ILD_FCCee_v01, field map, no shielding
 
     else
         echo crazy idet $idet

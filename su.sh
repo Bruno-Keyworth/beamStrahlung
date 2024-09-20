@@ -10,6 +10,9 @@ print_color() {
     echo
 }
 
+print_color "activate k4hep nightlies"
+k4n
+
 print_color "set local k4geo"
 export k4geo_DIR="$HOME/promotion/code/k4geo"
 export K4GEO="$HOME/promotion/code/k4geo"
