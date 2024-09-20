@@ -71,7 +71,9 @@ for idet in {8..10}; do # detector models
     ## detdir=/home/ilc/jeans/tpc-ion/lcgeo-00-16-08/ILD/compact ; detmod=ILD_l5_vONLYTPCFCC
     ## detdir=/home/ilc/jeans/tpc-ion/lcgeo-00-16-08/ILD/compact ; detmod=ILD_l5_vTPCFCC < same as ILD_l5_v02_2T
 
+    echo
     echo $detdir $detmod
+    echo
 
     outdir=$HOME/promotion/data/TEST
 
@@ -128,6 +130,7 @@ for idet in {8..10}; do # detector models
 		
 		
             fi
+	    echo
 
         done
 
