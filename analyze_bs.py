@@ -2,7 +2,7 @@ from pathlib import Path
 import argparse
 from os import fspath
 
-from podio import root_io
+from pyLCIO.io import LcioReader
 
 inputFileDefault = (
     Path.home()
@@ -23,7 +23,7 @@ def main():
     args = parser.parse_args()
     inputFile = args.inputFile
 
-    reader = root_io.Reader(fspath(inputFile))
+    reader = LcioReader.LcioReader(inputFile)
 
     from IPython import embed; import time; embed(); time.sleep(1)
 
