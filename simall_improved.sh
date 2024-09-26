@@ -78,12 +78,12 @@ for idet in {8..10}; do # detector models
             
             [[ $execute_bsub == false ]] && echo "idet $idet gpset $iset job $n"
 
-            command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-${n}_Z.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1\""
+            command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-${n}_Z.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.edm4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1\""
 
             if (( $iset == 0 )); then
                 [[ $execute_bsub == false ]] && echo $command || eval $command
             elif (( $iset == 1 )); then
-                command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-${n}_ZH.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZHatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1\""
+                command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-${n}_ZH.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZHatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.emd4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1\""
                 [[ $execute_bsub == false ]] && echo $command || eval $command
             elif (( $iset == 2 )); then
                 nn=${n}
@@ -92,7 +92,7 @@ for idet in {8..10}; do # detector models
                 elif (( $nn < 100 )); then
                     nn=0${n}
                 fi
-                command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.0${nn}.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ILC250_gt2mev_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent 250 > ${outdir}/${detmod}/out${n}.log 2>&1\""
+                command="bsub -q l \"ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.0${nn}.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ILC250_gt2mev_tpcTimeKeepMC_${ddsimfile}_${detmod}.emd4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent 250 > ${outdir}/${detmod}/out${n}.log 2>&1\""
                 [[ $execute_bsub == false ]] && echo $command || eval $command
             fi
             

@@ -104,12 +104,12 @@ for idet in {8..10}; do # detector models
             if (( $iset == 0 )); then
                 # start all at IP
                 # 91 GeV
-                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles input_allatip/pairs-${n}_Z.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1"
+                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles input_allatip/pairs-${n}_Z.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.edm4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1"
 
             elif (( $iset == 1 )); then
 
                 # 240 GeV
-                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-${n}_ZH.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZHatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1"
+                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-${n}_ZH.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ZHatIP_tpcTimeKeepMC_${ddsimfile}_${detmod}.edm4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent -1 > ${outdir}/${detmod}/out${n}.log 2>&1"
 
             elif (( $iset == 2 )); then
 
@@ -125,7 +125,7 @@ for idet in {8..10}; do # detector models
                 # bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /hsm/ilc/grid/storm/prod/ilc/mc-opt-3/generated/250-SetA/eepairs/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4.I270000.0${nn}.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ILC250_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent 250 > ${outdir}/${detmod}/out${n}.log 2>&1"
 
                 # use these for v03, v05 models (field map)
-                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.0${nn}.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ILC250_gt2mev_tpcTimeKeepMC_${ddsimfile}_${detmod}.slcio --numberOfEvents 5000 --guineapig.particlesPerEvent 250 > ${outdir}/${detmod}/out${n}.log 2>&1"
+                echo bsub -q l "ddsim --steeringFile ./ddsim_${ddsimfile}.py --compactFile ${detdir}/${detmod}/${detmod}.xml --inputFiles /group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.0${nn}.pairs --outputFile ${outdir}/${detmod}/pairs-${n}_ILC250_gt2mev_tpcTimeKeepMC_${ddsimfile}_${detmod}.edm4hep.root --numberOfEvents 5000 --guineapig.particlesPerEvent 250 > ${outdir}/${detmod}/out${n}.log 2>&1"
 
 		
 		
