@@ -130,22 +130,6 @@ def main() -> None:
         ax.set_ylabel("Frequency")
         plt.show()
 
-        # # Plot histogram of the y positions
-        # plt.figure(figsize=(6, 4))
-        # plt.hist(vbc_pos["y"], bins=30)
-        # plt.title("y Positions in Vertex Barrel")
-        # plt.xlabel("y Position")
-        # plt.ylabel("Frequency")
-        # plt.show()
-
-        # # Plot histogram of the x positions
-        # plt.figure(figsize=(6, 4))
-        # plt.hist(vbc_pos["x"], bins=30)
-        # plt.title("x Positions in Vertex Barrel")
-        # plt.xlabel("x Position")
-        # plt.ylabel("Frequency")
-        # plt.show()
-
         # Plot histogram of the times using BasePlotter
         _, ax = bp.plot()
         ax.hist(time[sub_det_key], bins=30)
