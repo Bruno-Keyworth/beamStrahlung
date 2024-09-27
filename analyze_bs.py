@@ -12,6 +12,9 @@ import uproot
 
 from vicbib import BasePlotter
 
+save_plots = True
+show_plts = False
+
 inputFileDefault = (
     Path.home()
     / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01/pairs-2_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.emd4hep.root"
@@ -81,6 +84,59 @@ def getPositionsAndTime(
     return pos, time
 
 
+def plotting(
+    pos: Dict[str, Dict[str, np.ndarray]],
+    time: Dict[str, np.ndarray],
+    show_plots: bool = True,
+) -> None:
+
+    for sub_det_key, sub_det_name in sub_det_cols.items():
+
+        bp = BasePlotter(
+            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_z_positions"
+        )
+        _, ax = bp.plot()
+        # Plot histogram of the z positions
+        ax.hist(pos[sub_det_key]["z"], bins=50)
+        ax.set_title(f"Z Positions in {sub_det_name.plot_name}")
+        ax.set_xlabel("Z Position in mm")
+        ax.set_ylabel("Frequency")
+        if show_plots:
+            plt.show()
+        bp.finish()
+
+        # Plot histogram of the times using BasePlotter
+        bp = BasePlotter(
+            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_hit_times"
+        )
+        _, ax = bp.plot()
+        ax.hist(time[sub_det_key], bins=30)
+        ax.set_title(f"Hit Time in {sub_det_name.plot_name}")
+        ax.set_xlabel("Time in ns")
+        ax.set_ylabel("Frequency")
+        if show_plots:
+            plt.show()
+        bp.finish()
+
+        # Plot 2D histogram of the x and y positions using BasePlotter
+        bp = BasePlotter(
+            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_xy_hist"
+        )
+        fig, ax = bp.plot()
+        h = ax.hist2d(
+            pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=50, cmap="viridis"
+        )
+        ax.set_title(f"X and Y Positions in {sub_det_name.plot_name}")
+        ax.set_xlabel("X Position in mm")
+        ax.set_ylabel("Y Position in mm")
+        fig.colorbar(
+            h[3], ax=ax, label="Counts"
+        )  # Add a colorbar to the figure, linked to the histogram
+        if show_plots:
+            plt.show()
+        bp.finish()
+
+
 def flatten_first_entry(
     data: Union[Dict[str, np.ndarray], np.ndarray]
 ) -> Union[Dict[str, np.ndarray], np.ndarray]:
@@ -118,49 +174,7 @@ def main() -> None:
     # events = getEvents(args.inputFiles)
     pos, time = getPositionsAndTime(getArgumentNameSpace())
 
-    bp = BasePlotter()
-
-    for sub_det_key, sub_det_name in sub_det_cols.items():
-
-        _, ax = bp.plot()
-        # Plot histogram of the z positions
-        ax.hist(pos[sub_det_key]["z"], bins=30)
-        ax.set_title(f"Z Positions in {sub_det_name.plot_name}")
-        ax.set_xlabel("Z Position")
-        ax.set_ylabel("Frequency")
-        plt.show()
-
-        # Plot histogram of the times using BasePlotter
-        _, ax = bp.plot()
-        ax.hist(time[sub_det_key], bins=30)
-        ax.set_title(f"Hit Time in {sub_det_name.plot_name}")
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Frequency")
-        plt.show()
-
-        # Plot 2D histogram of the x and y positions using BasePlotter
-        fig, ax = bp.plot()
-        h = ax.hist2d(
-            pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=50, cmap="viridis"
-        )
-        ax.set_title(f"X and Y Positions in {sub_det_name.plot_name}")
-        ax.set_xlabel("X Position")
-        ax.set_ylabel("Y Position")
-        fig.colorbar(
-            h[3], ax=ax, label="Counts"
-        )  # Add a colorbar to the figure, linked to the histogram
-        plt.show()
-
-    # #############################################
-    # # experimenting
-    # #############################################
-    #
-    # e = reader.get("events")[0]
-    # vertex_barrel_collection = e.get("VertexBarrelCollection")
-    # vertex_endcap_collection = e.get("VertexEndcapCollection")
-
-    # print(vertex_barrel_collection[0].getPosition().x)
-    # print(vertex_endcap_collection[0].getTime())
+    plotting(pos, time, show_plts)
 
 
 main()

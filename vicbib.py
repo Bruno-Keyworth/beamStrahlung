@@ -10,7 +10,7 @@ class BasePlotter:
     """
 
     def set_save_path(self):
-        self.save_path = Path.home() / "promotion/data"
+        self.save_path = Path.home() / "promotion/code/beamStrahlung/plots/"
 
     def set_params(self) -> None:
         """
@@ -54,7 +54,9 @@ class BasePlotter:
         # plt.tight_layout()
         # plt.tight_layout()
         if self.save:
-            plt.savefig(self.save_path + self.fig_name, dpi=self.dpi)  # , format="pdf"
+            plt.savefig(
+                Path(self.save_path) / self.fig_name, dpi=self.dpi
+            )  # , format="pdf"
         else:
             plt.show()
 
