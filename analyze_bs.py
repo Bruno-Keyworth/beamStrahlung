@@ -2,6 +2,7 @@ import argparse
 from dataclasses import dataclass
 from os import fspath
 from pathlib import Path
+from typing import Dict, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,7 +13,6 @@ import uproot
 inputFileDefault = (
     Path.home()
     / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01/pairs-2_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.emd4hep.root"
-    # / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01/pairs-1_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.slcio"
 )
 
 
@@ -23,13 +23,19 @@ class Collection:
     plot_name: str
 
 
-cols = {
+sub_det_cols = {
     "vb": Collection(branch_name="VertexBarrelCollection", plot_name="Vertex Barrel"),
     "ve": Collection(branch_name="VertexEndcapCollection", plot_name="Vertex Endcap"),
 }
 
+key_mapping = {
+    ".position.x": "x",
+    ".position.y": "y",
+    ".position.z": "z",
+}
 
-def getArgumentNameSpace():
+
+def getArgumentNameSpace() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--inputFiles",
@@ -41,17 +47,41 @@ def getArgumentNameSpace():
     return parser.parse_args()
 
 
-# def getEvents(files, events="events"):
-#     return uproot.lazy([f"{fspath(f)}:{events}"] for f in files)
+def getPositionsAndTime(
+    args: argparse.Namespace,
+) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    pos = {}
+    time = {}
+    with uproot.open(args.inputFiles[0] + ":events") as events:
+        for sub_det_key, sub_det_name in sub_det_cols.items():
+            branch_base_name = sub_det_name.branch_name + "/" + sub_det_name.branch_name
+            iter_cols = iter(key_mapping)
+            pos[sub_det_key] = events.arrays(
+                [
+                    branch_base_name + next(iter_cols),
+                    branch_base_name + next(iter_cols),
+                    branch_base_name + next(iter_cols),
+                ],
+                library="np",
+            )
+            time[sub_det_key] = events[
+                "VertexBarrelCollection/VertexBarrelCollection.time"
+            ].array(library="np")
+            # Renaming keys in place
+            for old_key, new_key in key_mapping.items():
+                pos[sub_det_key][new_key] = pos[sub_det_key].pop(
+                    branch_base_name + old_key
+                )
 
-key_mapping = {
-    "VertexBarrelCollection/VertexBarrelCollection.position.x": "x",
-    "VertexBarrelCollection/VertexBarrelCollection.position.y": "y",
-    "VertexBarrelCollection/VertexBarrelCollection.position.z": "z",
-}
+            # Flatten the arrays
+            pos[sub_det_key] = flatten_first_entry(pos[sub_det_key])
+            time[sub_det_key] = flatten_first_entry(time[sub_det_key])
+    return pos, time
 
 
-def flatten_first_entry(data):
+def flatten_first_entry(
+    data: Union[Dict[str, np.ndarray], np.ndarray]
+) -> Union[Dict[str, np.ndarray], np.ndarray]:
     """
     Replace each array of arrays with the first nested array.
 
@@ -75,106 +105,59 @@ def flatten_first_entry(data):
             else:
                 flattened_data[key] = value
         return flattened_data
-    elif isinstance(data, np.ndarray) and data.ndim > 1 and data.shape[0] > 0:
+    if isinstance(data, np.ndarray) and data.ndim > 1 and data.shape[0] > 0:
         # Handle the case for numpy arrays like vbc_time if similar structure
         return data[0]
-    else:
-        return data
+    return data
 
 
-def main():
+def main() -> None:
 
-    args = getArgumentNameSpace()
     # events = getEvents(args.inputFiles)
-    with uproot.open(args.inputFiles[0] + ":events") as events:
-        vbc_pos = events.arrays(
-            [
-                "VertexBarrelCollection/VertexBarrelCollection.position.x",
-                "VertexBarrelCollection/VertexBarrelCollection.position.y",
-                "VertexBarrelCollection/VertexBarrelCollection.position.z",
-            ],
-            library="np",
-        )
-        vbc_time = events["VertexBarrelCollection/VertexBarrelCollection.time"].array(
-            library="np"
-        )
-        # Renaming keys in place
-        for old_key, new_key in key_mapping.items():
-            vbc_pos[new_key] = vbc_pos.pop(old_key)
+    pos, time = getPositionsAndTime(getArgumentNameSpace())
 
-        # Flatten the arrays
-        vbc_pos = flatten_first_entry(vbc_pos)
-        vbc_time = flatten_first_entry(vbc_time)
+    for sub_det_key, sub_det_name in sub_det_cols.items():
 
-        import time
+        # Plot histogram of the z positions
+        plt.figure(figsize=(6, 4))
+        plt.hist(pos[sub_det_key]["z"], bins=30)
+        plt.title("Z Positions in " + sub_det_name.plot_name)
+        plt.xlabel("Z Position")
+        plt.ylabel("Frequency")
+        plt.show()
 
-        from IPython import embed
+        # # Plot histogram of the y positions
+        # plt.figure(figsize=(6, 4))
+        # plt.hist(vbc_pos["y"], bins=30)
+        # plt.title("y Positions in Vertex Barrel")
+        # plt.xlabel("y Position")
+        # plt.ylabel("Frequency")
+        # plt.show()
 
-        embed()
-        time.sleep(1)
+        # # Plot histogram of the x positions
+        # plt.figure(figsize=(6, 4))
+        # plt.hist(vbc_pos["x"], bins=30)
+        # plt.title("x Positions in Vertex Barrel")
+        # plt.xlabel("x Position")
+        # plt.ylabel("Frequency")
+        # plt.show()
 
-    # Plot histogram of the z positions
-    plt.figure(figsize=(6, 4))
-    plt.hist(vbc_pos["z"], bins=30)
-    plt.title("Z Positions in Vertex Barrel")
-    plt.xlabel("Z Position")
-    plt.ylabel("Frequency")
-    plt.show()
+        # Plot histogram of the times
+        plt.figure(figsize=(6, 4))
+        plt.hist(time[sub_det_key], bins=30)
+        plt.title("Hit Time in " + sub_det_name.plot_name)
+        plt.xlabel("Time")
+        plt.ylabel("Frequency")
+        plt.show()
 
-    # # Plot histogram of the y positions
-    # plt.figure(figsize=(6, 4))
-    # plt.hist(vbc_pos["y"], bins=30)
-    # plt.title("y Positions in Vertex Barrel")
-    # plt.xlabel("y Position")
-    # plt.ylabel("Frequency")
-    # plt.show()
-
-    # # Plot histogram of the x positions
-    # plt.figure(figsize=(6, 4))
-    # plt.hist(vbc_pos["x"], bins=30)
-    # plt.title("x Positions in Vertex Barrel")
-    # plt.xlabel("x Position")
-    # plt.ylabel("Frequency")
-    # plt.show()
-
-    # Plot histogram of the times
-    plt.figure(figsize=(6, 4))
-    plt.hist(vbc_time, bins=30)
-    plt.title("Hit Time in Vertex Barrel")
-    plt.xlabel("Time")
-    plt.ylabel("Frequency")
-    plt.show()
-
-    # Plot 2D histogram of the x and y positions
-    plt.figure(figsize=(6, 4))
-    h = plt.hist2d(vbc_pos["x"], vbc_pos["y"], bins=30, cmap="plasma")
-    plt.title("X and Y Positions in Vertex Barrel")
-    plt.xlabel("X Position")
-    plt.ylabel("Y Position")
-    plt.colorbar(label="Counts")
-    plt.show()
-
-    # import time
-
-    # from IPython import embed
-
-    # embed()
-    # time.sleep(1)
-
-    # for e in events:
-    #     vertex_barrel_collection = e.get("VertexBarrelCollection")
-    #     vertex_endcap_collection = e.get("VertexEndcapCollection")
-    #     for vertex_barrel_hit, vertex_endcap_hit in zip(
-    #         vertex_barrel_collection, vertex_endcap_collection
-    #     ):
-    #         print(vertex_barrel_hit.getPosition().x)
-    #         print(vertex_barrel_hit.getPosition().y)
-    #         print(vertex_barrel_hit.getPosition().z)
-    #         print(vertex_barrel_hit.getTime())
-    #         print(vertex_endcap_hit.getPosition().x)
-    #         print(vertex_endcap_hit.getPosition().y)
-    #         print(vertex_endcap_hit.getPosition().z)
-    #         print(vertex_endcap_hit.getTime())
+        # Plot 2D histogram of the x and y positions
+        plt.figure(figsize=(6, 4))
+        plt.hist2d(pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=30, cmap="plasma")
+        plt.title("X and Y Positions in " + sub_det_name.plot_name)
+        plt.xlabel("X Position")
+        plt.ylabel("Y Position")
+        plt.colorbar(label="Counts")
+        plt.show()
 
     # #############################################
     # # experimenting
