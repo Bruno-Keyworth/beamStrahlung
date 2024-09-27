@@ -4,7 +4,6 @@ from os import fspath
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -153,13 +152,7 @@ def main() -> None:
 
         # Plot 2D histogram of the x and y positions
         plt.figure(figsize=(6, 4))
-        plt.hist2d(
-            pos[sub_det_key]["x"],
-            pos[sub_det_key]["y"],
-            bins=30,
-            cmap="plasma",
-            norm=mcolors.LogNorm(),
-        )
+        plt.hist2d(pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=30, cmap="plasma")
         plt.title("X and Y Positions in " + sub_det_name.plot_name)
         plt.xlabel("X Position")
         plt.ylabel("Y Position")
