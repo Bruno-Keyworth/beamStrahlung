@@ -6,8 +6,6 @@ from typing import Dict, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-
-# import awkward as ak
 import uproot
 
 from vicbib import BasePlotter
@@ -17,7 +15,8 @@ show_plts = False
 
 inputFileDefault = (
     Path.home()
-    / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01/pairs-2_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.emd4hep.root"
+    / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01"
+    / "pairs-2_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.emd4hep.root"
 )
 
 
@@ -150,7 +149,7 @@ def flatten_first_entry(
     - A new dictionary or numpy array with the first nested arrays.
     """
     if isinstance(data, dict):
-        # Handle the case for dictionaries like vbc_pos
+        # Handle the case for dictionaries like pos
         flattened_data = {}
         for key, value in data.items():
             if (
@@ -171,7 +170,6 @@ def flatten_first_entry(
 
 def main() -> None:
 
-    # events = getEvents(args.inputFiles)
     pos, time = getPositionsAndTime(getArgumentNameSpace())
 
     plotting(pos, time, show_plts)
