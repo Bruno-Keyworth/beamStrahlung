@@ -10,6 +10,8 @@ import numpy as np
 # import awkward as ak
 import uproot
 
+from vicbib import BasePlotter
+
 inputFileDefault = (
     Path.home()
     / "promotion/data/TEST_IMPROVED/ILD_FCCee_v01/pairs-2_ZHatIP_tpcTimeKeepMC_keep_microcurlers_10MeV_30mrad_ILD_FCCee_v01.emd4hep.root"
@@ -116,14 +118,16 @@ def main() -> None:
     # events = getEvents(args.inputFiles)
     pos, time = getPositionsAndTime(getArgumentNameSpace())
 
+    bp = BasePlotter()
+
     for sub_det_key, sub_det_name in sub_det_cols.items():
 
+        _, ax = bp.plot()
         # Plot histogram of the z positions
-        plt.figure(figsize=(6, 4))
-        plt.hist(pos[sub_det_key]["z"], bins=30)
-        plt.title("Z Positions in " + sub_det_name.plot_name)
-        plt.xlabel("Z Position")
-        plt.ylabel("Frequency")
+        ax.hist(pos[sub_det_key]["z"], bins=30)
+        ax.set_title(f"Z Positions in {sub_det_name.plot_name}")
+        ax.set_xlabel("Z Position")
+        ax.set_ylabel("Frequency")
         plt.show()
 
         # # Plot histogram of the y positions
@@ -142,21 +146,25 @@ def main() -> None:
         # plt.ylabel("Frequency")
         # plt.show()
 
-        # Plot histogram of the times
-        plt.figure(figsize=(6, 4))
-        plt.hist(time[sub_det_key], bins=30)
-        plt.title("Hit Time in " + sub_det_name.plot_name)
-        plt.xlabel("Time")
-        plt.ylabel("Frequency")
+        # Plot histogram of the times using BasePlotter
+        _, ax = bp.plot()
+        ax.hist(time[sub_det_key], bins=30)
+        ax.set_title(f"Hit Time in {sub_det_name.plot_name}")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Frequency")
         plt.show()
 
-        # Plot 2D histogram of the x and y positions
-        plt.figure(figsize=(6, 4))
-        plt.hist2d(pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=30, cmap="plasma")
-        plt.title("X and Y Positions in " + sub_det_name.plot_name)
-        plt.xlabel("X Position")
-        plt.ylabel("Y Position")
-        plt.colorbar(label="Counts")
+        # Plot 2D histogram of the x and y positions using BasePlotter
+        fig, ax = bp.plot()
+        h = ax.hist2d(
+            pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=50, cmap="viridis"
+        )
+        ax.set_title(f"X and Y Positions in {sub_det_name.plot_name}")
+        ax.set_xlabel("X Position")
+        ax.set_ylabel("Y Position")
+        fig.colorbar(
+            h[3], ax=ax, label="Counts"
+        )  # Add a colorbar to the figure, linked to the histogram
         plt.show()
 
     # #############################################
