@@ -16,9 +16,17 @@ bunchCrossingEnd = 2
 nEvents = 5000
 guineaPigPartPerE = -1
 versionName = "python_test"
-detMods2Ana = {"ILD_FCCee_v01", "ILD_FCCee_v02"}
+# FCCee
+detMods2Ana = {
+    "ILD_FCCee_v01",
+    "ILD_FCCee_v01_fields",
+    "ILD_FCCee_v01_fields_noMask",
+    "ILD_FCCee_v02",
+}
 acceleratorConfigs2Ana = {"FCC91", "FCC240"}
-
+# # ILC
+# detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
+# acceleratorConfigs2Ana = {"ILC250"}
 
 outDir = Path.home() / "promotion" / "data" / versionName
 # define dirs to detector models
@@ -48,9 +56,15 @@ detectorConfigs = {
     "ILD_FCCee_v02": DetectorConfig(
         ddsim4FCC, ild4FCCDir / "ILD_FCCee_v02/ILD_FCCee_v02.xml"
     ),
-    "ILD_l5_v02": DetectorConfig(ddsim4ILC, ild4ILCDir / "ILD_l5_v02.xml"),
-    "ILD_l5_v03": DetectorConfig(ddsim4ILC, ild4ILCDir / "ILD_l5_v03.xml"),
-    "ILD_l5_v05": DetectorConfig(ddsim4ILC, ild4ILCDir / "ILD_l5_v05.xml"),
+    "ILD_l5_v02": DetectorConfig(
+        ddsim4ILC, ild4ILCDir / "ILD_l5_v02.xml"
+    ),  # uniform solenoid field
+    "ILD_l5_v03": DetectorConfig(
+        ddsim4ILC, ild4ILCDir / "ILD_l5_v03.xml"
+    ),  # realistic solenoid field
+    "ILD_l5_v05": DetectorConfig(
+        ddsim4ILC, ild4ILCDir / "ILD_l5_v05.xml"
+    ),  # realistic solenoid field & anti-DID field
 }
 
 beamStrahlungDataPaths = {
