@@ -52,34 +52,52 @@ def getArgumentNameSpace() -> argparse.Namespace:
 
 
 def getPositionsAndTime(
-    args: argparse.Namespace,
+    file_paths: List[str],
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
     pos = {}
     time = {}
-    with uproot.open(args.inputFiles[0] + ":events") as events:
-        for sub_det_key, sub_det_name in sub_det_cols.items():
-            branch_base_name = sub_det_name.branch_name + "/" + sub_det_name.branch_name
-            iter_cols = iter(key_mapping)
-            pos[sub_det_key] = events.arrays(
-                [
-                    branch_base_name + next(iter_cols),
-                    branch_base_name + next(iter_cols),
-                    branch_base_name + next(iter_cols),
-                ],
-                library="np",
-            )
-            time[sub_det_key] = events[
-                "VertexBarrelCollection/VertexBarrelCollection.time"
-            ].array(library="np")
-            # Renaming keys in place
-            for old_key, new_key in key_mapping.items():
-                pos[sub_det_key][new_key] = pos[sub_det_key].pop(
-                    branch_base_name + old_key
-                )
 
-            # Flatten the arrays
-            pos[sub_det_key] = flatten_first_entry(pos[sub_det_key])
-            time[sub_det_key] = flatten_first_entry(time[sub_det_key])
+    # Initialize the keys with empty lists to collect data from all files
+    for sub_det_key in sub_det_cols.keys():
+        pos[sub_det_key] = []
+        time[sub_det_key] = []
+
+    for file_path in file_paths:
+        with uproot.open(file_path + ":events") as events:
+            for sub_det_key, sub_det_name in sub_det_cols.items():
+                branch_base_name = (
+                    sub_det_name.branch_name + "/" + sub_det_name.branch_name
+                )
+                iter_cols = iter(key_mapping)
+                pos_data = events.arrays(
+                    [
+                        branch_base_name + next(iter_cols),
+                        branch_base_name + next(iter_cols),
+                        branch_base_name + next(iter_cols),
+                    ],
+                    library="np",
+                )
+                time_data = events[
+                    "VertexBarrelCollection/VertexBarrelCollection.time"
+                ].array(library="np")
+
+                # Renaming keys in place
+                for old_key, new_key in key_mapping.items():
+                    pos_data[new_key] = pos_data.pop(branch_base_name + old_key)
+
+                # Flatten the arrays
+                pos_data = flatten_first_entry(pos_data)
+                time_data = flatten_first_entry(time_data)
+
+                # Append to the respective list
+                pos[sub_det_key].append(pos_data)
+                time[sub_det_key].append(time_data)
+
+    # Concatenate all arrays per key
+    for sub_det_key in sub_det_cols.keys():
+        pos[sub_det_key] = np.concatenate(pos[sub_det_key], axis=0)
+        time[sub_det_key] = np.concatenate(time[sub_det_key], axis=0)
+
     return pos, time
 
 
