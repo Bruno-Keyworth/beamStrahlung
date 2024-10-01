@@ -86,7 +86,7 @@ def main():
     processes the files in the given directory, and displays the results in a table format.
     """
     parser = argparse.ArgumentParser(description='Analyze detector model files')
-    parser.add_argument('directory', type=str, help='Directory containing the detector model files')
+    parser.add_argument('--directory', '-d', dest='directory', type=str, help='Directory containing the detector model files')
 
     args = parser.parse_args()
 
