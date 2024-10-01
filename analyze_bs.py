@@ -115,17 +115,26 @@ def plotting(
     pos_dict: Dict[str, Dict[str, np.ndarray]],
     time_dict: Dict[str, np.ndarray],
     show_plots: bool = True,
+    save_plots: bool = False,
+    det_mod: str = "",
+    scenario: str = "",
 ) -> None:
 
     for sub_det_key, sub_det_name in sub_det_cols.items():
 
+        if det_mod and scenario:
+            common_save_path = f"{sub_det_name.plot_name} {det_mod} {scenario}"
+            common_title = f"{sub_det_name.plot_name}  {det_mod}@{scenario}"
+        else:
+            common_save_path = common_title = sub_det_name.plot_name
+
         bp = BasePlotter(
-            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_z_positions"
+            save_plots, common_save_path.replace(" ", "_") + "_z_positions"
         )
         _, ax = bp.plot()
         # Plot histogram of the z positions
         ax.hist(pos_dict[sub_det_key]["z"], bins=50)
-        ax.set_title(f"Z Positions in {sub_det_name.plot_name}")
+        ax.set_title(f"Z Positions in {common_title}")
         ax.set_xlabel("Z Position in mm")
         ax.set_ylabel("Frequency")
         if show_plots:
@@ -133,12 +142,10 @@ def plotting(
         bp.finish()
 
         # Plot histogram of the times using BasePlotter
-        bp = BasePlotter(
-            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_hit_times"
-        )
+        bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_hit_times")
         _, ax = bp.plot()
         ax.hist(time_dict[sub_det_key], bins=30)
-        ax.set_title(f"Hit Time in {sub_det_name.plot_name}")
+        ax.set_title(f"Hit Time in {common_title}")
         ax.set_xlabel("Time in ns")
         ax.set_ylabel("Frequency")
         if show_plots:
@@ -146,9 +153,7 @@ def plotting(
         bp.finish()
 
         # Plot 2D histogram of the x and y positions using BasePlotter
-        bp = BasePlotter(
-            save_plots, sub_det_name.plot_name.replace(" ", "_") + "_xy_hist"
-        )
+        bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_xy_hist")
         fig, ax = bp.plot()
         h = ax.hist2d(
             pos_dict[sub_det_key]["x"],
@@ -156,7 +161,7 @@ def plotting(
             bins=50,
             cmap="viridis",
         )
-        ax.set_title(f"X and Y Positions in {sub_det_name.plot_name}")
+        ax.set_title(f"X and Y Positions in {common_title}")
         ax.set_xlabel("X Position in mm")
         ax.set_ylabel("Y Position in mm")
         fig.colorbar(

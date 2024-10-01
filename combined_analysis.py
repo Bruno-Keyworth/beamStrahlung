@@ -11,6 +11,7 @@ from analyze_available_data import (  # Import from the old script
 from analyze_bs import getPositionsAndTime, plotting
 
 show_plts = True
+save_plots = False
 DEFAULT_DETECTOR_MODEL = "ILD_FCCee_v01"  # Set your default detector model
 DEFAULT_SCENARIO = "FCC91"  # Set your default scenario
 
@@ -73,7 +74,14 @@ def main():
         ]
         pos, time = getPositionsAndTime(file_paths)
 
-        plotting(pos, time, show_plts)
+        plotting(
+            pos,
+            time,
+            show_plts,
+            save_plots=save_plots,
+            scenario=scenario,
+            det_mod=detector_model,
+        )
 
         ##############################
         # Debugging print out
