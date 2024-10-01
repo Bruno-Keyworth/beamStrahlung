@@ -3,6 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 from analyze_available_data import (
     parse_files,
+    sort_detector_data,
     print_detector_info,
 )  # Import from the old script
 
@@ -58,12 +59,14 @@ def main():
                 f"No files found for the combination: Detector Model='{detector_model}', Scenario='{scenario}'"
             )
 
+        # Sort detector data
+        detector_data = sort_detector_data(detector_data)
         # Analyze all bX Numbers for the found combination
         bX_numbers = detector_data[detector_model][scenario]
         for bX_number in bX_numbers:
             file_path = (
                 Path(args.directory)
-                / f"{detector_model}-{scenario}-{bX_number}-some_other_info.edm4hep.root"
+                / f"{detector_model}-{scenario}-{bX_number}-nEvts_5000.edm4hep.root"
             )
             #            getPositionsAndTime(file_path)  # Call the imported analyze_data function
             print(

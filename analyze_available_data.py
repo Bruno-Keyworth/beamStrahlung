@@ -20,7 +20,6 @@ Arguments:
     <directory>  Path to the directory containing the detector model files.
 """
 
-
 def parse_files(directory):
     """
     Parse the specified directory for files that match the expected naming format.
@@ -56,23 +55,48 @@ def parse_files(directory):
     return detector_data
 
 
-def print_detector_info(detector_data):
+def sort_detector_data(detector_data):
+    """
+    Sort the detector data by detector model, scenario, and bX numbers.
+
+    Parameters:
+    detector_data (defaultdict): The nested dictionary containing detector
+                                  models, scenarios, and their corresponding bX numbers.
+
+    Returns:
+    sorted_data (defaultdict): A sorted nested defaultdict.
+    """
+    sorted_data = defaultdict(lambda: defaultdict(list))
+
+    # Sort the detector models
+    for detector_model in sorted(detector_data.keys()):
+        scenarios = detector_data[detector_model]
+        
+        # Sort scenarios for the current detector model
+        for scenario in sorted(scenarios.keys()):
+            bX_numbers = sorted(scenarios[scenario])  # Sort bX_numbers
+            sorted_data[detector_model][scenario] = bX_numbers
+
+    return sorted_data
+
+
+def print_detector_info(sorted_detector_data):
     """
     Print a table of detector information, including models, scenarios,
     and the count of different files found for each scenario.
 
     Parameters:
-    detector_data (defaultdict): The nested dictionary containing detector
-                                  models, scenarios, and their corresponding bX numbers.
+    sorted_detector_data (defaultdict): The sorted nested dictionary containing detector
+                                        models, scenarios, and their corresponding bX numbers.
     """
     table_data = []
 
-    # Sort the detector models
-    for detector_model in sorted(detector_data.keys()):
-        scenarios = detector_data[detector_model]
+    # Prepare the table data
+    for detector_model in sorted(sorted_detector_data.keys()):
+        scenarios = sorted_detector_data[detector_model]
 
-        # Sort scenarios for the current detector model
-        for scenario in sorted(scenarios.keys()):
+        # Iterate over the scenarios for the current detector model
+        for scenario in scenarios.keys():
             bX_numbers = scenarios[scenario]
             num_files = len(bX_numbers)
             table_data.append([detector_model, scenario, num_files])
@@ -113,8 +137,11 @@ def main():
     # Parse files to gather required information
     detector_data = parse_files(args.directory)
 
+    # Sort the detector data
+    sorted_detector_data = sort_detector_data(detector_data)
+
     # Print detector model info
-    print_detector_info(detector_data)
+    print_detector_info(sorted_detector_data)
 
 
 if __name__ == "__main__":
