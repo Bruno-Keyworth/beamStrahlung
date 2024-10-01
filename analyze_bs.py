@@ -134,7 +134,7 @@ def plotting(
         _, ax = bp.plot()
         # Plot histogram of the z positions
         ax.hist(pos_dict[sub_det_key]["z"], bins=50)
-        ax.set_title(f"Z Positions in {common_title}")
+        ax.set_title(common_title)
         ax.set_xlabel("Z Position in mm")
         ax.set_ylabel("Frequency")
         if show_plots:
@@ -145,7 +145,7 @@ def plotting(
         bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_hit_times")
         _, ax = bp.plot()
         ax.hist(time_dict[sub_det_key], bins=30)
-        ax.set_title(f"Hit Time in {common_title}")
+        ax.set_title(common_title)
         ax.set_xlabel("Time in ns")
         ax.set_ylabel("Frequency")
         if show_plots:
@@ -161,7 +161,7 @@ def plotting(
             bins=50,
             cmap="viridis",
         )
-        ax.set_title(f"X and Y Positions in {common_title}")
+        ax.set_title(common_title)
         ax.set_xlabel("X Position in mm")
         ax.set_ylabel("Y Position in mm")
         fig.colorbar(
