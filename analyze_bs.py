@@ -2,7 +2,7 @@ import argparse
 from dataclasses import dataclass
 from os import fspath
 from pathlib import Path
-from typing import Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,8 +10,8 @@ import uproot
 
 from vicbib import BasePlotter
 
-save_plots = True
-show_plts = False
+save_plots = False
+show_plts = True
 
 inputFileDefault = (
     Path.home()
@@ -44,8 +44,9 @@ def getArgumentNameSpace() -> argparse.Namespace:
     parser.add_argument(
         "--inputFiles",
         "-f",
-        default=[fspath(inputFileDefault)],
-        type=list,
+        default=fspath(inputFileDefault),
+        type=str,
+        nargs="+",
         help="relative path to the input file",
     )
     return parser.parse_args()
@@ -54,13 +55,15 @@ def getArgumentNameSpace() -> argparse.Namespace:
 def getPositionsAndTime(
     file_paths: List[str],
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    all_pos = {}
+    all_time = {}
     pos = {}
-    time = {}
+    time_d = {}
 
     # Initialize the keys with empty lists to collect data from all files
     for sub_det_key in sub_det_cols.keys():
         pos[sub_det_key] = []
-        time[sub_det_key] = []
+        time_d[sub_det_key] = []
 
     for file_path in file_paths:
         with uproot.open(file_path + ":events") as events:
@@ -88,22 +91,29 @@ def getPositionsAndTime(
                 # Flatten the arrays
                 pos_data = flatten_first_entry(pos_data)
                 time_data = flatten_first_entry(time_data)
+                time_data = time_data[0]
 
                 # Append to the respective list
                 pos[sub_det_key].append(pos_data)
-                time[sub_det_key].append(time_data)
+                time_d[sub_det_key].append(time_data)
 
-    # Concatenate all arrays per key
-    for sub_det_key in sub_det_cols.keys():
-        pos[sub_det_key] = np.concatenate(pos[sub_det_key], axis=0)
-        time[sub_det_key] = np.concatenate(time[sub_det_key], axis=0)
+    for sub_det_key, file_list in pos.items():  # keys vb, ve
 
-    return pos, time
+        all_pos[sub_det_key] = dict(
+            (k, [d[k] for d in file_list]) for k in file_list[0]
+        )
+        for keyy, lis in all_pos[sub_det_key].items():
+            all_pos[sub_det_key][keyy] = np.concatenate(lis)
+
+    for sub_det_key, file_list in time_d.items():
+        all_time[sub_det_key] = np.concatenate(time_d[sub_det_key])
+
+    return all_pos, all_time
 
 
 def plotting(
-    pos: Dict[str, Dict[str, np.ndarray]],
-    time: Dict[str, np.ndarray],
+    pos_dict: Dict[str, Dict[str, np.ndarray]],
+    time_dict: Dict[str, np.ndarray],
     show_plots: bool = True,
 ) -> None:
 
@@ -114,7 +124,7 @@ def plotting(
         )
         _, ax = bp.plot()
         # Plot histogram of the z positions
-        ax.hist(pos[sub_det_key]["z"], bins=50)
+        ax.hist(pos_dict[sub_det_key]["z"], bins=50)
         ax.set_title(f"Z Positions in {sub_det_name.plot_name}")
         ax.set_xlabel("Z Position in mm")
         ax.set_ylabel("Frequency")
@@ -127,7 +137,7 @@ def plotting(
             save_plots, sub_det_name.plot_name.replace(" ", "_") + "_hit_times"
         )
         _, ax = bp.plot()
-        ax.hist(time[sub_det_key], bins=30)
+        ax.hist(time_dict[sub_det_key], bins=30)
         ax.set_title(f"Hit Time in {sub_det_name.plot_name}")
         ax.set_xlabel("Time in ns")
         ax.set_ylabel("Frequency")
@@ -141,7 +151,10 @@ def plotting(
         )
         fig, ax = bp.plot()
         h = ax.hist2d(
-            pos[sub_det_key]["x"], pos[sub_det_key]["y"], bins=50, cmap="viridis"
+            pos_dict[sub_det_key]["x"],
+            pos_dict[sub_det_key]["y"],
+            bins=50,
+            cmap="viridis",
         )
         ax.set_title(f"X and Y Positions in {sub_det_name.plot_name}")
         ax.set_xlabel("X Position in mm")
@@ -188,7 +201,8 @@ def flatten_first_entry(
 
 def main() -> None:
 
-    pos, time = getPositionsAndTime(getArgumentNameSpace())
+    print(getArgumentNameSpace().inputFiles)
+    pos, time = getPositionsAndTime(getArgumentNameSpace().inputFiles)
 
     plotting(pos, time, show_plts)
 
