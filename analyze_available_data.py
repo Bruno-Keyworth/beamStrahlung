@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from collections import defaultdict
+from tabulate import tabulate
 
 def parse_files(directory):
     detector_data = defaultdict(lambda: defaultdict(set))
@@ -9,7 +10,7 @@ def parse_files(directory):
     for file_path in Path(directory).rglob('*.edm4hep.root'):
         # Extract components of the filename
         parts = file_path.stem.split('-')
-        
+
         if len(parts) != 4:
             continue  # Skip any files that don't match the expected format
 
@@ -24,21 +25,27 @@ def parse_files(directory):
     return detector_data
 
 def print_detector_info(detector_data):
-    for detector_model, scenarios in detector_data.items():
-        print(f"Detector Model: {detector_model}")
+    table_data = []
+
+    # Sort the detector models
+    for detector_model in sorted(detector_data.keys()):
+        scenarios = detector_data[detector_model]
         for scenario, bX_numbers in scenarios.items():
             num_files = len(bX_numbers)
-            print(f"  Scenario: {scenario}, Different Number of Files: {num_files}")
+            table_data.append([detector_model, scenario, num_files])
+
+    # Print the table using tabulate
+    print(tabulate(table_data, headers=["Detector Model", "Scenario", "Different Number of Files"], tablefmt="grid"))
 
 def main():
     parser = argparse.ArgumentParser(description='Analyze detector model files')
-    parser.add_argument('-d', type=str, dest="directory",help='Directory containing the detector model files')
-    
+    parser.add_argument('directory', type=str, help='Directory containing the detector model files')
+
     args = parser.parse_args()
-    
+
     # Parse files to gather required information
     detector_data = parse_files(args.directory)
-    
+
     # Print detector model info
     print_detector_info(detector_data)
 
