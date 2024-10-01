@@ -201,10 +201,10 @@ def flatten_first_entry(
 
 def main() -> None:
 
-    print(getArgumentNameSpace().inputFiles)
     pos, time = getPositionsAndTime(getArgumentNameSpace().inputFiles)
 
     plotting(pos, time, show_plts)
 
 
-main()
+if __name__ == "__main__":
+    main()

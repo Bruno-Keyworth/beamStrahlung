@@ -1,16 +1,18 @@
 import argparse
-from pathlib import Path
 from collections import defaultdict
-from analyze_available_data import (
+from os import fspath
+from pathlib import Path
+
+from analyze_available_data import (  # Import from the old script
     parse_files,
-    sort_detector_data,
     print_detector_info,
-)  # Import from the old script
+    sort_detector_data,
+)
+from analyze_bs import getPositionsAndTime, plotting
 
-# from analyze_bs import getPositionsAndTime  # Import from the generated script
-
-DEFAULT_DETECTOR_MODEL = "ILD_l5_v02"  # Set your default detector model
-DEFAULT_SCENARIO = "ILC250"  # Set your default scenario
+show_plts = True
+DEFAULT_DETECTOR_MODEL = "ILD_FCCee_v01"  # Set your default detector model
+DEFAULT_SCENARIO = "FCC91"  # Set your default scenario
 
 
 def main():
@@ -61,17 +63,31 @@ def main():
 
         # Sort detector data
         detector_data = sort_detector_data(detector_data)
-        # Analyze all bX Numbers for the found combination
-        bX_numbers = detector_data[detector_model][scenario]
-        for bX_number in bX_numbers:
-            file_path = (
+
+        file_paths = [
+            fspath(
                 Path(args.directory)
                 / f"{detector_model}-{scenario}-{bX_number}-nEvts_5000.edm4hep.root"
             )
-            #            getPositionsAndTime(file_path)  # Call the imported analyze_data function
-            print(
-                f"Analyzing data from file: {file_path}"
-            )  # Log the file being analyzed
+            for bX_number in detector_data[detector_model][scenario]
+        ]
+        pos, time = getPositionsAndTime(file_paths)
+
+        plotting(pos, time, show_plts)
+
+        ##############################
+        # Debugging print out
+        ##############################
+        # Analyze all bX Numbers for the found combination
+        # bX_numbers = detector_data[detector_model][scenario]
+        # for bX_number in bX_numbers:
+        #     file_path = (
+        #         Path(args.directory)
+        #         / f"{detector_model}-{scenario}-{bX_number}-nEvts_5000.edm4hep.root"
+        #     )
+        #     print(
+        #         f"Analyzing data from file: {file_path}"
+        #     )  # Log the file being analyzed
 
 
 if __name__ == "__main__":
