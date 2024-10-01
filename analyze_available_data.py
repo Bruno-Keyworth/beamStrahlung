@@ -3,7 +3,37 @@ from pathlib import Path
 from collections import defaultdict
 from tabulate import tabulate
 
+"""
+This script analyzes detector model files following a specific naming convention.
+
+The expected file naming format is:
+DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
+
+The script scans a directory for files that match this format, organizes the 
+data by detector model and scenario, and counts the number of different 
+bX_NUMBER files found for each scenario within each detector model.
+
+Usage:
+    python analyze_detectors.py <directory>
+
+Arguments:
+    <directory>  Path to the directory containing the detector model files.
+"""
+
 def parse_files(directory):
+    """
+    Parse the specified directory for files that match the expected naming format.
+    
+    The expected filename format is:
+    DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
+    
+    Parameters:
+    directory (str): The directory to scan for files.
+    
+    Returns:
+    defaultdict: A nested dictionary containing detector models as keys, 
+                 scenarios as subkeys, and sets of bX numbers as values.
+    """
     detector_data = defaultdict(lambda: defaultdict(set))
 
     # Iterate over all .edm4hep.root files in the provided directory
@@ -25,6 +55,14 @@ def parse_files(directory):
     return detector_data
 
 def print_detector_info(detector_data):
+    """
+    Print a table of detector information, including models, scenarios, 
+    and the count of different files found for each scenario.
+    
+    Parameters:
+    detector_data (defaultdict): The nested dictionary containing detector 
+                                  models, scenarios, and their corresponding bX numbers.
+    """
     table_data = []
 
     # Sort the detector models
@@ -41,10 +79,19 @@ def print_detector_info(detector_data):
     print(tabulate(table_data, headers=["Detector Model", "Scenario", "Different Number of Files"], tablefmt="grid"))
 
 def main():
+    """
+    Main function to execute the script.
+    
+    It parses command line arguments, prints the expected filename format, 
+    processes the files in the given directory, and displays the results in a table format.
+    """
     parser = argparse.ArgumentParser(description='Analyze detector model files')
     parser.add_argument('directory', type=str, help='Directory containing the detector model files')
 
     args = parser.parse_args()
+
+    # Print expected file naming format
+    print("Expected file naming format: DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root")
 
     # Parse files to gather required information
     detector_data = parse_files(args.directory)
