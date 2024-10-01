@@ -30,7 +30,10 @@ def print_detector_info(detector_data):
     # Sort the detector models
     for detector_model in sorted(detector_data.keys()):
         scenarios = detector_data[detector_model]
-        for scenario, bX_numbers in scenarios.items():
+        
+        # Sort scenarios for the current detector model
+        for scenario in sorted(scenarios.keys()):
+            bX_numbers = scenarios[scenario]
             num_files = len(bX_numbers)
             table_data.append([detector_model, scenario, num_files])
 
