@@ -5,11 +5,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from podio import root_io
 
-input_file_path = (
-    Path.home()
-    / "promotion/code/ILDConfig/StandardConfig/production/data/muon_tracking_test_if1_REC.edm4hep.root"
-)
-
 
 def main():
     # Set up argument parser
@@ -20,8 +15,23 @@ def main():
         required=True,
         help="Choose 'print' to display hit numbers, or 'plot' to show histograms.",
     )
+    parser.add_argument(
+        "--inputFile",
+        type=str,
+        default=fspath(
+            Path.home()
+            / "promotion/code/ILDConfig/StandardConfig/production/data/muon_tracking_test_if1_REC.edm4hep.root"
+        ),
+        help=(
+            "Specify the input file. If not provided, a default path "
+            "will be used: ~/promotion/code/ILDConfig/StandardConfig/production/data/muon_tracking_test_if1_REC.edm4hep.root"
+        ),
+    )
 
     args = parser.parse_args()
+
+    # Determine the input file path
+    input_file_path = args.inputFile
 
     f = root_io.Reader(fspath(input_file_path))
 

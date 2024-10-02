@@ -3,11 +3,7 @@ from collections import defaultdict
 from os import fspath
 from pathlib import Path
 
-from analyze_available_data import (  # Import from the old script
-    parse_files,
-    print_detector_info,
-    sort_detector_data,
-)
+from analyze_available_data import parse_files, print_detector_info, sort_detector_data
 from analyze_bs import getPositionsAndTime, plotting
 
 show_plts = True
@@ -65,29 +61,33 @@ def main():
         # Sort detector data
         detector_data = sort_detector_data(detector_data)
 
+        # Get all bX_numbers and prepare file paths
+        bX_numbers = detector_data[detector_model][scenario]
         file_paths = [
             fspath(
                 Path(args.directory)
                 / f"{detector_model}-{scenario}-{bX_number}-nEvts_5000.edm4hep.root"
             )
-            for bX_number in detector_data[detector_model][scenario]
+            for bX_number in bX_numbers
         ]
+
+        # Determine the number of bunch crossings
+        num_bunch_crossings = len(file_paths)
+
         pos, time = getPositionsAndTime(file_paths)
 
         plotting(
             pos,
             time,
+            num_bunch_crossings,  # Pass the number of bunch crossings
             show_plts,
             save_plots=save_plots,
-            scenario=scenario,
             det_mod=detector_model,
+            scenario=scenario,
         )
 
-        ##############################
-        # Debugging print out
-        ##############################
-        # Analyze all bX Numbers for the found combination
-        # bX_numbers = detector_data[detector_model][scenario]
+        #########  # Debugging print out
+        #########  # Analyze all bX Numbers for the found combination
         # for bX_number in bX_numbers:
         #     file_path = (
         #         Path(args.directory)

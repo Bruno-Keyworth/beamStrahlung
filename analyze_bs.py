@@ -114,11 +114,28 @@ def getPositionsAndTime(
 def plotting(
     pos_dict: Dict[str, Dict[str, np.ndarray]],
     time_dict: Dict[str, np.ndarray],
+    num_bunch_crossings: int = 1,
     show_plots: bool = True,
     save_plots: bool = False,
     det_mod: str = "",
     scenario: str = "",
 ) -> None:
+    """
+    Generate and display plots of position and timing data for various detectors.
+
+    Parameters:
+        pos_dict (Dict[str, Dict[str, np.ndarray]]): Dictionary with detector
+            keys mapping to sub-dictionaries containing position arrays ('x', 'y', 'z').
+        time_dict (Dict[str, np.ndarray]): Dictionary with detector keys mapping to time arrays.
+        num_bunch_crossings (int, optional): Number of bunch crossings considered. Default is 1.
+        show_plots (bool, optional): Whether to display plots. Default is True.
+        save_plots (bool, optional): Whether to save plots. Default is False.
+        det_mod (str, optional): Detector module string for naming conventions in plots.
+        scenario (str, optional): Scenario string for naming conventions in plots.
+    """
+
+    # Define the limits in millimeters for specific sub-detector keys
+    limits = {"vb": 60, "ve": 105}  # Limit in mm for 'vb'  # Limit in mm for 've'
 
     for sub_det_key, sub_det_name in sub_det_cols.items():
 
@@ -128,15 +145,19 @@ def plotting(
         else:
             common_save_path = common_title = sub_det_name.plot_name
 
+        # Plot histogram of the z positions
         bp = BasePlotter(
             save_plots, common_save_path.replace(" ", "_") + "_z_positions"
         )
         _, ax = bp.plot()
-        # Plot histogram of the z positions
-        ax.hist(pos_dict[sub_det_key]["z"], bins=50)
+        ax.hist(
+            pos_dict[sub_det_key]["z"],
+            bins=50,
+            weights=np.ones_like(pos_dict[sub_det_key]["z"]) / num_bunch_crossings,
+        )
         ax.set_title(common_title)
         ax.set_xlabel("Z Position in mm")
-        ax.set_ylabel("Frequency")
+        ax.set_ylabel("Avg. hits per BX")
         if show_plots:
             plt.show()
         bp.finish()
@@ -144,29 +165,43 @@ def plotting(
         # Plot histogram of the times using BasePlotter
         bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_hit_times")
         _, ax = bp.plot()
-        ax.hist(time_dict[sub_det_key], bins=30)
+        ax.hist(
+            time_dict[sub_det_key],
+            bins=30,
+            weights=np.ones_like(time_dict[sub_det_key]) / num_bunch_crossings,
+        )
         ax.set_title(common_title)
         ax.set_xlabel("Time in ns")
-        ax.set_ylabel("Frequency")
+        ax.set_ylabel("Avg. hits per BX")
         if show_plots:
             plt.show()
         bp.finish()
 
+        # Determine the limits for 2D histograms based on sub_det_key
+        limit_value = limits.get(sub_det_key, None)
+        if limit_value is not None:
+            plot_range = [(-limit_value, limit_value), (-limit_value, limit_value)]
+        else:
+            plot_range = None
+
         # Plot 2D histogram of the x and y positions using BasePlotter
         bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_xy_hist")
         fig, ax = bp.plot()
+
         h = ax.hist2d(
             pos_dict[sub_det_key]["x"],
             pos_dict[sub_det_key]["y"],
             bins=50,
             cmap="viridis",
+            weights=np.ones_like(pos_dict[sub_det_key]["x"]) / num_bunch_crossings,
+            range=plot_range,
         )
+
         ax.set_title(common_title)
         ax.set_xlabel("X Position in mm")
         ax.set_ylabel("Y Position in mm")
-        fig.colorbar(
-            h[3], ax=ax, label="Counts"
-        )  # Add a colorbar to the figure, linked to the histogram
+        fig.colorbar(h[3], ax=ax, label="Avg. hits per BX")
+
         if show_plots:
             plt.show()
         bp.finish()
