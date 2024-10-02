@@ -10,8 +10,11 @@ from analyze_bs import getPositionsAndTime, plotting
 
 show_plts = True
 save_plots = False
-DEFAULT_DETECTOR_MODEL = "ILD_FCCee_v01"  # Set your default detector model
-DEFAULT_SCENARIO = "FCC91"  # Set your default scenario
+DEFAULT_DETECTOR_MODELS = [
+    "ILD_FCCee_v01",
+    "ILD_FCCee_v02",
+]  # Set your default detector models
+DEFAULT_SCENARIOS = ["FCC91", "FCC240"]  # Set your default scenarios
 
 
 def get_cache_filename(cache_dir, detector_model, scenario, num_bX):
@@ -118,10 +121,16 @@ def main():
         help="Mode of operation: overview, analysis, or ana_all",
     )
     parser.add_argument(
-        "--detectorModel", type=str, help="Specify the detector model for analysis"
+        "--detectorModel",
+        nargs="*",
+        type=str,
+        help="Specify one or more detector models for analysis",
     )
     parser.add_argument(
-        "--scenario", type=str, help="Specify the scenario for analysis"
+        "--scenario",
+        nargs="*",
+        type=str,
+        help="Specify one or more scenarios for analysis",
     )
     parser.add_argument(
         "--cacheDir",
@@ -142,15 +151,20 @@ def main():
     if args.mode == "overview":
         print_detector_info(detector_data)
     elif args.mode == "analysis":
-        # Set defaults if not provided
-        detector_model = (
-            args.detectorModel if args.detectorModel else DEFAULT_DETECTOR_MODEL
-        )
-        scenario = args.scenario if args.scenario else DEFAULT_SCENARIO
+        # Determine which detector models and scenarios to analyze
+        detector_models = args.detectorModel or DEFAULT_DETECTOR_MODELS
+        scenarios = args.scenario or DEFAULT_SCENARIOS
 
-        analyze_combination(args.directory, detector_model, scenario, args)
+        for detector_model in detector_models:
+            if detector_model in detector_data:
+                for scenario in scenarios:
+                    if scenario in detector_data[detector_model]:
+                        analyze_combination(
+                            args.directory, detector_model, scenario, args
+                        )
 
     elif args.mode == "ana_all":
+        # Analyze all combinations of detector models and scenarios
         for detector_model in sorted(detector_data.keys()):
             for scenario in sorted(detector_data[detector_model].keys()):
                 analyze_combination(args.directory, detector_model, scenario, args)
