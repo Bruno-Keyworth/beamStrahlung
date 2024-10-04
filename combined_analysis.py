@@ -11,8 +11,8 @@ from analyze_bs import getPositionsAndTime, plotting
 show_plts = True
 save_plots = False
 DEFAULT_DETECTOR_MODELS = [
-    "ILD_FCCee_v01",
-    "ILD_FCCee_v02",
+    "ILD_FCCee_v01_fields",
+    # "ILD_FCCee_v02",
 ]  # Set your default detector models
 DEFAULT_SCENARIOS = ["FCC91", "FCC240"]  # Set your default scenarios
 

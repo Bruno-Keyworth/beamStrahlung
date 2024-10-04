@@ -173,6 +173,7 @@ def plotting(
         ax.set_title(common_title)
         ax.set_xlabel("Time in ns")
         ax.set_ylabel("Avg. hits per BX")
+        ax.set_yscale("log")
         if show_plots:
             plt.show()
         bp.finish()
@@ -200,7 +201,7 @@ def plotting(
         ax.set_title(common_title)
         ax.set_xlabel("X Position in mm")
         ax.set_ylabel("Y Position in mm")
-        fig.colorbar(h[3], ax=ax, label="Avg. hits per BX")
+        fig.colorbar(h[3], ax=ax, label="Avg. hits per BX and Area^2")
 
         if show_plots:
             plt.show()
