@@ -8,13 +8,14 @@ from tabulate import tabulate
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
 from analyze_bs import getPositionsAndTime, plotting
 
-show_plts = True
-save_plots = False
+show_plts = False
+save_plots = True
 DEFAULT_DETECTOR_MODELS = [
     "ILD_FCCee_v01_fields",
+    "ILD_l5_v02",
     # "ILD_FCCee_v02",
 ]  # Set your default detector models
-DEFAULT_SCENARIOS = ["FCC91", "FCC240"]  # Set your default scenarios
+DEFAULT_SCENARIOS = ["FCC91", "FCC240","ILC250"]  # Set your default scenarios
 
 
 def get_cache_filename(cache_dir, detector_model, scenario, num_bX):

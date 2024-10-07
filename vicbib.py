@@ -10,7 +10,7 @@ class BasePlotter:
     """
 
     def set_save_path(self):
-        self.save_path = Path.home() / "promotion/code/beamStrahlung/plots/"
+        self.save_path = Path.home() / "promotion/data/bs_plots"
 
     def set_params(self) -> None:
         """
