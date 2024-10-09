@@ -15,11 +15,11 @@ executeBsub = False  # Boolean variable to switch between modes
 bunchCrossingEnd = 2
 nEvents = 5000
 guineaPigPartPerE = -1
-versionName = "python_test"
+versionName = "post_ecfa"
 # FCCee
 detMods2Ana = {
     "ILD_FCCee_v01",
-#    "ILD_FCCee_v01_fields",
+    "ILD_FCCee_v01_fields",
 #    "ILD_FCCee_v01_fields_noMask",
 #    "ILD_FCCee_v02",
 }
