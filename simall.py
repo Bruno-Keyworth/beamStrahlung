@@ -23,7 +23,7 @@ detMods2Ana = {
 #    "ILD_FCCee_v01_fields_noMask",
 #    "ILD_FCCee_v02",
 }
-acceleratorConfigs2Ana = {"FCC91", "FCC240"}
+acceleratorConfigs2Ana = {"FCC091", "FCC240"}
 # # ILC
 # detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
 # acceleratorConfigs2Ana = {"ILC250"}
@@ -71,7 +71,9 @@ beamStrahlungDataPaths = {
     "ILC250": Path(
         "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
     ),
-    "FCC91": Path("/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"),
+    "FCC091": Path(
+        "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+    ),
     "FCC240": Path(
         "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
     ),
@@ -88,7 +90,7 @@ def checkMaxBXNumberExceeded(bsTypeName: str, bunchCrossing: int) -> bool:
     """
     check whether maximum number of bunch crossings per beam strahlung type is exceeded
     """
-    if bsTypeName in {"FCC240", "FCC91"} and bunchCrossing > 100:
+    if bsTypeName in {"FCC240", "FCC091"} and bunchCrossing > 100:
         print(
             f"\nThere are only 100 bunch crossing for {bsTypeName} available",
             end="\n\n",

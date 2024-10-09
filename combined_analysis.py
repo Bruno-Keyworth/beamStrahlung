@@ -16,7 +16,7 @@ DEFAULT_DETECTOR_MODELS = [
     "ILD_l5_v02",
     # "ILD_FCCee_v02",
 ]  # Set your default detector models
-DEFAULT_SCENARIOS = ["FCC91", "FCC240","ILC250"]  # Set your default scenarios
+DEFAULT_SCENARIOS = ["FCC091", "FCC240", "ILC250"]  # Set your default scenarios
 
 
 def get_cache_filename(cache_dir, detector_model, scenario, num_bX):
