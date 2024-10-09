@@ -180,28 +180,46 @@ def plotting(
 
         # Determine the limits for 2D histograms based on sub_det_key
         limit_value = limits.get(sub_det_key, None)
-        if limit_value is not None:
-            plot_range = [(-limit_value, limit_value), (-limit_value, limit_value)]
-        else:
-            plot_range = None
 
         # Plot 2D histogram of the x and y positions using BasePlotter
         bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_xy_hist")
         fig, ax = bp.plot()
 
-        h = ax.hist2d(
+        # Compute bin edges to calculate bin area
+        x_bins = np.linspace(-limit_value, limit_value, 51)  # 50 bins means 51 edges
+        y_bins = np.linspace(-limit_value, limit_value, 51)
+
+        # Calculate bin widths and heights
+        bin_width = np.diff(x_bins)
+        bin_height = np.diff(y_bins)
+
+        # Create a 2D histogram and get the value counts
+        h, _, _ = np.histogram2d(
             pos_dict[sub_det_key]["x"],
             pos_dict[sub_det_key]["y"],
-            bins=50,
-            cmap="viridis",
+            bins=[x_bins, y_bins],
             weights=np.ones_like(pos_dict[sub_det_key]["x"]) / num_bunch_crossings,
-            range=plot_range,
+        )
+
+        # Calculate bin area for normalization (area = width * height)
+        bin_area = np.outer(bin_height, bin_width)
+
+        # Normalize the histogram to count per square millimeter
+        h_normalized = h / bin_area
+
+        # Plotting the 2D histogram
+        h_image = ax.imshow(
+            h_normalized.T,
+            origin="lower",
+            extent=[-limit_value, limit_value, -limit_value, limit_value],
+            cmap="viridis",
+            aspect="auto",
         )
 
         ax.set_title(common_title)
         ax.set_xlabel("X Position in mm")
         ax.set_ylabel("Y Position in mm")
-        fig.colorbar(h[3], ax=ax, label="Avg. hits per BX and Area^2")
+        fig.colorbar(h_image, ax=ax, label=r"Avg. hits per BX and $\text{mm}^2$")
 
         if show_plots:
             plt.show()
