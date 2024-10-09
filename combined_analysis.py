@@ -7,6 +7,7 @@ from tabulate import tabulate
 
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
 from analyze_bs import getPositionsAndTime, plotting
+from simall import beamStrahlungDataPaths
 
 show_plts = False
 save_plots = True
@@ -131,6 +132,7 @@ def main():
         "--scenario",
         nargs="*",
         type=str,
+        choices=set(beamStrahlungDataPaths),  # single source of truth
         help="Specify one or more scenarios for analysis",
     )
     parser.add_argument(
