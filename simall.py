@@ -19,9 +19,9 @@ versionName = "python_test"
 # FCCee
 detMods2Ana = {
     "ILD_FCCee_v01",
-    "ILD_FCCee_v01_fields",
-    "ILD_FCCee_v01_fields_noMask",
-    "ILD_FCCee_v02",
+#    "ILD_FCCee_v01_fields",
+#    "ILD_FCCee_v01_fields_noMask",
+#    "ILD_FCCee_v02",
 }
 acceleratorConfigs2Ana = {"FCC91", "FCC240"}
 # # ILC

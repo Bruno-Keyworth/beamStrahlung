@@ -3,11 +3,11 @@
 
   cerr << "hello1" << endl;
 
-  const int nfile = 2;
+  const int nfile=1;
 
-  TFile *f[nfile];
-  f[0] = new TFile("/home/ilc/schwan/promotion/data/mag_field_map_det/graph_scan_field_perp_Y_z_0_600_IF1.root");
-  f[1] = new TFile("/home/ilc/schwan/promotion/data/mag_field_map_det/graph_scan_field_perp_Y_z_0_600_IF1F.root");
+  TFile* f[nfile];
+  f[0] = new TFile("/home/ilc/schwan/promotion/data/mag_field_map_det/graph_scan_field_perp_Y_z_0_400_IF1F.root");
+  // f[0] = new TFile("/home/ilc/schwan/promotion/data/mag_field_map_det/graph_scan_field_perp_Y_z_0_600_IF1.root");
   // f[2] = new TFile("/home/ilc/jeans/tpc-ion/lcgeo-00-16-08/ILD/ILD_l5_v03_field.root");
   // f[3] = new TFile("/home/ilc/jeans/tpc-ion/lcgeo-00-16-08/ILD/ILD_l5_v05_field.root");
   // f[4] = new TFile("/home/ilc/jeans/lcgeo-1/ILD/ILD_l5_v11gamma.root");
@@ -28,8 +28,8 @@
     bz[i] = (TH2F *)f[i]->Get("Slice0/slice0_Bz");
   }
 
-  x0[0]->SetTitle("ILD_FCCee_v01");
-  x0[1]->SetTitle("ILD_FCCee_v01_fields");
+  x0[0]->SetTitle("ILD_FCCee_v01_fields");
+  // x0[0]->SetTitle("ILD_FCCee_v01");
   // x0[2]->SetTitle("ILD_l5_v03");
   // x0[3]->SetTitle("ILD_l5_v05");
   // x0[4]->SetTitle("ILD_l5_v11gamma");
@@ -42,7 +42,6 @@
   float scale = 2;
   for (int i = 0; i < nfile; i++)
   {
-
     cc->Clear();
     cc->SetLogz();
     x0[i]->Draw("col");
