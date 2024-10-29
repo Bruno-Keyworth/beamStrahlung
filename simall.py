@@ -19,9 +19,9 @@ versionName = "post_ecfa"
 # FCCee
 detMods2Ana = {
     "ILD_FCCee_v01",
-    "ILD_FCCee_v01_fields",
-#    "ILD_FCCee_v01_fields_noMask",
-#    "ILD_FCCee_v02",
+    #    "ILD_FCCee_v01_fields",
+    #    "ILD_FCCee_v01_fields_noMask",
+    #    "ILD_FCCee_v02",
 }
 acceleratorConfigs2Ana = {"FCC091", "FCC240"}
 # # ILC
@@ -67,17 +67,43 @@ detectorConfigs = {
     ),  # realistic solenoid field & anti-DID field
 }
 
+desyDustBeamstrahlungBasePath = (
+    Path("/nfs/dust/ilc/user/") / Path.home().parts[-1] / "beamStrahlungDataFromDaniel"
+)
 beamStrahlungDataPaths = {
-    "ILC250": Path(
-        "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
-    ),
-    "FCC091": Path(
-        "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
-    ),
-    "FCC240": Path(
-        "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
-    ),
+    # are desy naf paths, the others are on the kek cc
+    "ILC250": {
+        "ilc": Path(
+            "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
+        ),
+        "desy.de": desyDustBeamstrahlungBasePath
+        / "pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs",
+    },
+    "FCC091": {
+        "ilc": Path(
+            "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+        ),
+        "desy.de": desyDustBeamstrahlungBasePath
+        / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs",
+    },
+    "FCC240": {
+        "ilc": Path(
+            "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
+        ),
+        "desy.de": desyDustBeamstrahlungBasePath
+        / "guineaPig_fromAndrea_pairs100_allAtIP-ZH/pairs-#N_ZH.pairs",
+    },
 }
+
+
+def getPathForCurrentMachine(pathDict: dict) -> Path:
+    pathParts = Path.home().parts
+    for key in pathDict:
+        if key in pathParts:
+            return pathDict[key]
+    raise KeyError(
+        f"Machine unknown. One of the keys {list(pathDict)} has to be in {pathParts}."
+    )
 
 
 def replaceBXNumberInString(bsTypeName: str, bsPath: Path, bxN: int) -> str:
@@ -106,7 +132,6 @@ def checkMaxBXNumberExceeded(bsTypeName: str, bunchCrossing: int) -> bool:
 
 
 def main():
-
     # # Function to simulate sourcing (can only be done inside the same shell process)
     # def source_setup_script(script):
     #     return subprocess.run(
@@ -119,22 +144,19 @@ def main():
     outDir.mkdir(parents=True, exist_ok=True)
 
     # Iterate over the beam strahlung scenarios
-    for bsTypeName, bsPath in beamStrahlungDataPaths.items():
+    for bsTypeName, bsPathDict in beamStrahlungDataPaths.items():
         if bsTypeName in acceleratorConfigs2Ana:
-
             for bunchCrossing in range(1, bunchCrossingEnd + 1):
-
                 if checkMaxBXNumberExceeded(bsTypeName, bunchCrossing):
                     break
 
                 bsPathWithBXNumber = replaceBXNumberInString(
-                    bsTypeName, bsPath, bunchCrossing
+                    bsTypeName, getPathForCurrentMachine(bsPathDict), bunchCrossing
                 )
 
                 # Iterate over the detector models
                 for detModName, detModConfigs in detectorConfigs.items():
                     if detModName in detMods2Ana:
-
                         # Construct the compactFile name
                         compactFile = k4geoDir / detModConfigs.relativeCompactFilePath
 
