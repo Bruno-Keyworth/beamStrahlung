@@ -10,7 +10,6 @@ from analyze_bs import getPositionsAndTime, plotting
 from simall import beamStrahlungDataPaths
 
 show_plts = False
-save_plots = True
 DEFAULT_DETECTOR_MODELS = [
     "ILD_FCCee_v01_fields",
     "ILD_l5_v02",
@@ -100,7 +99,7 @@ def analyze_combination(directory, detector_model, scenario, args):
         time,
         num_bX,  # Pass the number of bunch crossings
         show_plts,
-        save_plots=save_plots,
+        save_plots=args.savePlots,
         scenario=scenario,
         det_mod=detector_model,
     )
@@ -140,6 +139,9 @@ def main():
         default=fspath(Path.home() / "promotion/data/bs_cache_combined_analysis"),
         type=str,
         help="Directory to store cache files",
+    )
+    parser.add_argument(
+        "--savePlots", action="store_true", help="If given, plots are stored."
     )
 
     args = parser.parse_args()
