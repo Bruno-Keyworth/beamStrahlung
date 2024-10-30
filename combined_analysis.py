@@ -106,6 +106,11 @@ def analyze_combination(directory, detector_model, scenario, args):
 
 
 def main():
+    if "desy.de" in Path.home().parts:
+        homeDir = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
+    else:
+        homeDir = Path.home()
+
     parser = argparse.ArgumentParser(
         description="Combined Analysis of Detector Model Files"
     )
@@ -136,7 +141,7 @@ def main():
     )
     parser.add_argument(
         "--cacheDir",
-        default=fspath(Path.home() / "promotion/data/bs_cache_combined_analysis"),
+        default=fspath(homeDir / "promotion/data/bs_cache_combined_analysis"),
         type=str,
         help="Directory to store cache files",
     )

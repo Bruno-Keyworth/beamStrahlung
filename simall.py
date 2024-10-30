@@ -1,6 +1,7 @@
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from os import getenv
 
 
 @dataclass
@@ -28,15 +29,22 @@ acceleratorConfigs2Ana = {"FCC091", "FCC240"}
 # detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
 # acceleratorConfigs2Ana = {"ILC250"}
 
-outDir = Path.home() / "promotion" / "data" / versionName
 # define dirs to detector models
-k4geoDir = Path.home() / "promotion" / "code" / "k4geo"
+codeDir = Path(getenv("myCodeDir"))
+beamStrahlungCodeDir = codeDir / "beamStrahlung"
+k4geoDir = codeDir / "k4geo"
 ild4FCCDir = Path("FCCee") / "ILD_FCCee" / "compact"
 ild4ILCDir = Path("ILD") / "compact" / "ILD_sl5_v02"
+if "desy.de" in Path.home().parts:
+    desyDustHomePath = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
+    outDir = desyDustHomePath
+else:
+    outDir = Path.home()
+outDir = outDir / "promotion" / "data" / versionName
 
 # define Paths to ddsim files
-ddsim4FCC = Path.home() / "promotion/code/bs/ddsim_keep_microcurlers_10MeV_30mrad.py"
-ddsim4ILC = Path.home() / "promotion/code/bs/ddsim_keep_microcurlers_10MeV.py"
+ddsim4FCC = beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV_30mrad.py"
+ddsim4ILC = beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV.py"
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
 setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
@@ -67,9 +75,7 @@ detectorConfigs = {
     ),  # realistic solenoid field & anti-DID field
 }
 
-desyDustBeamstrahlungBasePath = (
-    Path("/nfs/dust/ilc/user/") / Path.home().parts[-1] / "beamStrahlungDataFromDaniel"
-)
+desyDustBeamstrahlungBasePath = desyDustHomePath / "beamStrahlungDataFromDaniel"
 beamStrahlungDataPaths = {
     # are desy naf paths, the others are on the kek cc
     "ILC250": {
@@ -174,7 +180,7 @@ def main():
 
                         # Execute or print the command depending on executeBsub
                         if executeBsub:
-                            subprocess.run(bsub_command, shell=True)
+                            subprocess.run(bsub_command, shell=True, check=True)
                         else:
                             print(bsub_command, end="\n\n")
 
