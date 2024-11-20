@@ -9,6 +9,7 @@ import numpy as np
 import uproot
 
 from vicbib import BasePlotter
+from utils import add_spherical_coordinates_in_place
 
 save_plots = False
 show_plts = True
@@ -117,6 +118,7 @@ def plotting(
     num_bunch_crossings: int = 1,
     show_plots: bool = True,
     save_plots: bool = False,
+    make_theta_hist: bool = False,
     det_mod: str = "",
     scenario: str = "",
 ) -> None:
@@ -161,6 +163,28 @@ def plotting(
         if show_plots:
             plt.show()
         bp.finish()
+
+        # Plot histogram of the theta positions
+        if make_theta_hist:
+
+            add_spherical_coordinates_in_place(pos_dict[sub_det_key])
+
+            bp = BasePlotter(
+                save_plots, common_save_path.replace(" ", "_") + "_theta_positions"
+            )
+            _, ax = bp.plot()
+            ax.hist(
+                pos_dict[sub_det_key]["theta"],
+                bins=50,
+                weights=np.ones_like(pos_dict[sub_det_key]["theta"])
+                / num_bunch_crossings,
+            )
+            ax.set_title(common_title)
+            ax.set_xlabel("Theta")
+            ax.set_ylabel("Avg. hits per BX")
+            if show_plots:
+                plt.show()
+            bp.finish()
 
         # Plot histogram of the times using BasePlotter
         bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_hit_times")

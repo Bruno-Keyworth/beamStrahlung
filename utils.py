@@ -45,6 +45,36 @@ def cartesian_to_spherical(cartesian: np.ndarray) -> np.ndarray:
     return spherical
 
 
+def add_spherical_coordinates_in_place(position_dict: dict) -> None:
+    """
+    Convert Cartesian coordinates to spherical coordinates and add them in-place to the input dictionary.
+
+    Parameters:
+    -----------
+    position_dict : dict
+        A dictionary containing 'x', 'y', and 'z' as keys with numpy array values.
+
+    Modifies:
+    ---------
+    The input dictionary is modified in-place to include three additional keys:
+    - 'r' for radial distance
+    - 'theta' for elevation angle from the Z-axis down
+    - 'phi' for azimuth angle
+    """
+    # Combine x, y, z arrays into a single Nx3 Cartesian coordinates array
+    cartesian = np.column_stack(
+        (position_dict["x"], position_dict["y"], position_dict["z"])
+    )
+
+    # Use the cartesian_to_spherical function to compute spherical coordinates
+    spherical = cartesian_to_spherical(cartesian)
+
+    # Add the spherical coordinates to the dictionary in-place
+    position_dict["r"] = spherical[:, 0]
+    position_dict["theta"] = spherical[:, 1]
+    position_dict["phi"] = spherical[:, 2]
+
+
 def construct_beamstrahlung_paths(
     desy_dust_home_path, is_executed_on_desy_naf
 ) -> Dict[str, Dict[str, Path]]:
