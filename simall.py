@@ -29,13 +29,15 @@ acceleratorConfigs2Ana = {"FCC091", "FCC240"}
 # detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
 # acceleratorConfigs2Ana = {"ILC250"}
 
+isExecutedOnDESYNAF = "desy.de" in Path.home().parts
+
 # define dirs to detector models
 codeDir = Path(getenv("myCodeDir"))
 beamStrahlungCodeDir = codeDir / "beamStrahlung"
 k4geoDir = codeDir / "k4geo"
 ild4FCCDir = Path("FCCee") / "ILD_FCCee" / "compact"
 ild4ILCDir = Path("ILD") / "compact" / "ILD_sl5_v02"
-if "desy.de" in Path.home().parts:
+if isExecutedOnDESYNAF:
     desyDustHomePath = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
     outDir = desyDustHomePath
 else:
@@ -75,29 +77,43 @@ detectorConfigs = {
     ),  # realistic solenoid field & anti-DID field
 }
 
-desyDustBeamstrahlungBasePath = desyDustHomePath / "beamStrahlungDataFromDaniel"
+desyDustBeamstrahlungBasePath = (
+    desyDustHomePath / "beamStrahlungDataFromDaniel" if isExecutedOnDESYNAF else ""
+)
 beamStrahlungDataPaths = {
     # are desy naf paths, the others are on the kek cc
     "ILC250": {
         "ilc": Path(
             "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
         ),
-        "desy.de": desyDustBeamstrahlungBasePath
-        / "pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs",
+        "desy.de": (
+            desyDustBeamstrahlungBasePath
+            / "pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
+            if desyDustBeamstrahlungBasePath
+            else ""
+        ),
     },
     "FCC091": {
         "ilc": Path(
             "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
         ),
-        "desy.de": desyDustBeamstrahlungBasePath
-        / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs",
+        "desy.de": (
+            desyDustBeamstrahlungBasePath
+            / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs"
+            if desyDustBeamstrahlungBasePath
+            else ""
+        ),
     },
     "FCC240": {
         "ilc": Path(
             "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
         ),
-        "desy.de": desyDustBeamstrahlungBasePath
-        / "guineaPig_fromAndrea_pairs100_allAtIP-ZH/pairs-#N_ZH.pairs",
+        "desy.de": (
+            desyDustBeamstrahlungBasePath
+            / "guineaPig_fromAndrea_pairs100_allAtIP-ZH/pairs-#N_ZH.pairs"
+            if desyDustBeamstrahlungBasePath
+            else ""
+        ),
     },
 }
 
