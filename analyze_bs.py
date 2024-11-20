@@ -180,7 +180,7 @@ def plotting(
                 / num_bunch_crossings,
             )
             ax.set_title(common_title)
-            ax.set_xlabel("Theta")
+            ax.set_xlabel("Theta in rad")
             ax.set_ylabel("Avg. hits per BX")
             if show_plots:
                 plt.show()

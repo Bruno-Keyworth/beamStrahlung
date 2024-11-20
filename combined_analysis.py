@@ -1,12 +1,12 @@
 import argparse
-import pickle
 from os import fspath
 from pathlib import Path
 
 from tabulate import tabulate
 
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
-from analyze_bs import get_positions_and_time, plotting
+from analyze_bs import plotting
+from caching import handle_cache_operations
 from simall import bs_data_paths
 
 show_plts = False
@@ -16,25 +16,6 @@ DEFAULT_DETECTOR_MODELS = [
     # "ILD_FCCee_v02",
 ]  # Set your default detector models
 DEFAULT_SCENARIOS = ["FCC091", "FCC240", "ILC250"]  # Set your default scenarios
-
-
-def get_cache_filename(cache_dir, detector_model, scenario, num_bX):
-    """Generate a unique cache filename based on the detector model, scenario, and number of bXs."""
-    return f"{cache_dir}/cache_{detector_model}_{scenario}_{num_bX}.pkl"
-
-
-def load_from_cache(cache_file):
-    """Load data from cache if it exists."""
-    if cache_file.exists():
-        with cache_file.open("rb") as f:
-            return pickle.load(f)
-    return None
-
-
-def save_to_cache(cache_file, data):
-    """Save data to cache."""
-    with cache_file.open("wb") as f:
-        pickle.dump(data, f)
 
 
 def analyze_combination(directory, detector_model, scenario, args):
@@ -76,23 +57,9 @@ def analyze_combination(directory, detector_model, scenario, args):
         )
     )
 
-    # Cache-related operations
-    cache_file = Path(
-        get_cache_filename(args.cacheDir, detector_model, scenario, num_bX)
+    pos, time = handle_cache_operations(
+        args.cacheDir, detector_model, scenario, num_bX, file_paths
     )
-    cached_data = load_from_cache(cache_file)
-
-    if cached_data is not None:
-        pos, time = cached_data
-        print(
-            f"Loaded data for Detector Model='{detector_model}', Scenario='{scenario}' from cache."
-        )
-    else:
-        pos, time = get_positions_and_time(file_paths)
-        save_to_cache(cache_file, (pos, time))
-        print(
-            f"Data loaded and cached for Detector Model='{detector_model}', Scenario='{scenario}'."
-        )
 
     plotting(
         pos,
@@ -151,10 +118,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    # Use pathlib to ensure the cache directory exists
-    cache_dir_path = Path(args.cacheDir)
-    cache_dir_path.mkdir(parents=True, exist_ok=True)
 
     # Parse the files to gather detector data
     detector_data = parse_files(args.directory)
