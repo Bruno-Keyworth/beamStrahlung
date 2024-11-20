@@ -1,7 +1,9 @@
 import subprocess
 from dataclasses import dataclass
-from pathlib import Path
 from os import getenv
+from pathlib import Path
+
+from utils import construct_beamstrahlung_paths, get_path_for_current_machine
 
 
 @dataclass
@@ -41,8 +43,10 @@ if isExecutedOnDESYNAF:
     desyDustHomePath = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
     outDir = desyDustHomePath
 else:
+    desyDustHomePath = ""
     outDir = Path.home()
-outDir = outDir / "promotion" / "data" / versionName
+outDir = outDir / "promotion" / "data" / versionName  # assumption
+bs_data_paths = construct_beamstrahlung_paths(desyDustHomePath, isExecutedOnDESYNAF)
 
 # define Paths to ddsim files
 ddsim4FCC = beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV_30mrad.py"
@@ -76,56 +80,6 @@ detectorConfigs = {
         ddsim4ILC, ild4ILCDir / "ILD_l5_v05.xml"
     ),  # realistic solenoid field & anti-DID field
 }
-
-desyDustBeamstrahlungBasePath = (
-    desyDustHomePath / "beamStrahlungDataFromDaniel" if isExecutedOnDESYNAF else ""
-)
-beamStrahlungDataPaths = {
-    # are desy naf paths, the others are on the kek cc
-    "ILC250": {
-        "ilc": Path(
-            "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
-        ),
-        "desy.de": (
-            desyDustBeamstrahlungBasePath
-            / "pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
-            if desyDustBeamstrahlungBasePath
-            else ""
-        ),
-    },
-    "FCC091": {
-        "ilc": Path(
-            "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
-        ),
-        "desy.de": (
-            desyDustBeamstrahlungBasePath
-            / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs"
-            if desyDustBeamstrahlungBasePath
-            else ""
-        ),
-    },
-    "FCC240": {
-        "ilc": Path(
-            "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
-        ),
-        "desy.de": (
-            desyDustBeamstrahlungBasePath
-            / "guineaPig_fromAndrea_pairs100_allAtIP-ZH/pairs-#N_ZH.pairs"
-            if desyDustBeamstrahlungBasePath
-            else ""
-        ),
-    },
-}
-
-
-def getPathForCurrentMachine(pathDict: dict) -> Path:
-    pathParts = Path.home().parts
-    for key in pathDict:
-        if key in pathParts:
-            return pathDict[key]
-    raise KeyError(
-        f"Machine unknown. One of the keys {list(pathDict)} has to be in {pathParts}."
-    )
 
 
 def replaceBXNumberInString(bsTypeName: str, bsPath: Path, bxN: int) -> str:
@@ -166,14 +120,16 @@ def main():
     outDir.mkdir(parents=True, exist_ok=True)
 
     # Iterate over the beam strahlung scenarios
-    for bsTypeName, bsPathDict in beamStrahlungDataPaths.items():
-        if bsTypeName in acceleratorConfigs2Ana:
+    for bs_scenario_name, bs_path_dict in bs_data_paths.items():
+        if bs_scenario_name in acceleratorConfigs2Ana:
             for bunchCrossing in range(1, bunchCrossingEnd + 1):
-                if checkMaxBXNumberExceeded(bsTypeName, bunchCrossing):
+                if checkMaxBXNumberExceeded(bs_scenario_name, bunchCrossing):
                     break
 
                 bsPathWithBXNumber = replaceBXNumberInString(
-                    bsTypeName, getPathForCurrentMachine(bsPathDict), bunchCrossing
+                    bs_scenario_name,
+                    get_path_for_current_machine(bs_path_dict),
+                    bunchCrossing,
                 )
 
                 # Iterate over the detector models
@@ -185,7 +141,7 @@ def main():
                         # Construct the output file names
                         outName = (
                             outDir
-                            / f"{detModName}-{bsTypeName}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{nEvents}"
+                            / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{nEvents}"
                         )
                         outputFileName = outName.with_suffix(".edm4hep.root")
                         outputLogFileName = outName.with_suffix(".log")
