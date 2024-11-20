@@ -18,66 +18,14 @@ DEFAULT_DETECTOR_MODELS = [
 DEFAULT_SCENARIOS = ["FCC091", "FCC240", "ILC250"]  # Set your default scenarios
 
 
-def analyze_combination(directory, detector_model, scenario, args):
-    """Analyze a specific combination of detector model and scenario."""
-
-    # Sort detector data
-    detector_data = sort_detector_data(parse_files(directory))
-
-    if (
-        detector_model not in detector_data
-        or scenario not in detector_data[detector_model]
-    ):
-        raise ValueError(
-            f"No files found for the combination: Detector Model='{detector_model}', Scenario='{scenario}'"
-        )
-
-    # Get the list of bX identifiers (bunch crossing identifiers)
-    bX_identifiers = detector_data[detector_model][scenario]
-
-    # Determine the number of bunch crossings
-    num_bX = len(bX_identifiers)
-
-    # Prepare file paths
-    file_paths = [
-        fspath(
-            Path(directory)
-            / f"{detector_model}-{scenario}-{bX_identifier}-nEvts_5000.edm4hep.root"
-        )
-        for bX_identifier in bX_identifiers
-    ]
-
-    # Print current combination in a grid table format
-    table_data = [[detector_model, scenario, num_bX]]
-    print(
-        tabulate(
-            table_data,
-            headers=["Detector Model", "Scenario", "Num Bunch Crossings"],
-            tablefmt="grid",
-        )
-    )
-
-    pos, time = handle_cache_operations(
-        args.cacheDir, detector_model, scenario, num_bX, file_paths
-    )
-
-    plotting(
-        pos,
-        time,
-        num_bX,  # Pass the number of bunch crossings
-        show_plts,
-        save_plots=args.savePlots,
-        make_theta_hist=True,
-        scenario=scenario,
-        det_mod=detector_model,
-    )
-
-
-def main():
+def get_home_directory():
     if "desy.de" in Path.home().parts:
-        homeDir = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
-    else:
-        homeDir = Path.home()
+        return Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
+    return Path.home()
+
+
+def parse_arguments():
+    homeDir = get_home_directory()
 
     parser = argparse.ArgumentParser(
         description="Combined Analysis of Detector Model Files"
@@ -117,7 +65,68 @@ def main():
         "--savePlots", action="store_true", help="If given, plots are stored."
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def analyze_combination(directory, detector_model, scenario, args):
+    """Analyze a specific combination of detector model and scenario."""
+
+    # Sort detector data
+    detector_data = sort_detector_data(parse_files(directory))
+
+    if (
+        detector_model not in detector_data
+        or scenario not in detector_data[detector_model]
+    ):
+        raise ValueError(
+            f"No files found for the combination: Detector Model='{detector_model}', Scenario='{scenario}'"
+        )
+
+    # Get the list of bX identifiers (bunch crossing identifiers)
+    bX_identifiers = detector_data[detector_model][scenario]
+
+    # Determine the number of bunch crossings
+    num_bX = len(bX_identifiers)
+
+    # Prepare file paths
+    file_paths = [
+        fspath(
+            Path(directory)
+            / f"{detector_model}-{scenario}-{bX_identifier}-nEvts_5000.edm4hep.root"
+        )
+        for bX_identifier in bX_identifiers
+    ]
+
+    # Print current combination in a grid table format
+    table_data = [[detector_model, scenario, num_bX]]
+    print(
+        tabulate(
+            table_data,
+            headers=["Detector Model", "Scenario", "Num Bunch Crossings"],
+            tablefmt="grid",
+        )
+    )
+
+    # Get the position and time arrays including caching operations
+    pos, time = handle_cache_operations(
+        args.cacheDir, detector_model, scenario, num_bX, file_paths
+    )
+
+    plotting(
+        pos,
+        time,
+        num_bX,  # Pass the number of bunch crossings
+        show_plts,
+        save_plots=args.savePlots,
+        make_theta_hist=True,
+        scenario=scenario,
+        det_mod=detector_model,
+    )
+
+
+def main():
+
+    args = parse_arguments()
 
     # Parse the files to gather detector data
     detector_data = parse_files(args.directory)
