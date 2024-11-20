@@ -6,7 +6,7 @@ from pathlib import Path
 from tabulate import tabulate
 
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
-from analyze_bs import getPositionsAndTime, plotting
+from analyze_bs import get_positions_and_time, plotting
 from simall import beamStrahlungDataPaths
 
 show_plts = False
@@ -88,7 +88,7 @@ def analyze_combination(directory, detector_model, scenario, args):
             f"Loaded data for Detector Model='{detector_model}', Scenario='{scenario}' from cache."
         )
     else:
-        pos, time = getPositionsAndTime(file_paths)
+        pos, time = get_positions_and_time(file_paths)
         save_to_cache(cache_file, (pos, time))
         print(
             f"Data loaded and cached for Detector Model='{detector_model}', Scenario='{scenario}'."

@@ -39,7 +39,7 @@ key_mapping = {
 }
 
 
-def getArgumentNameSpace() -> argparse.Namespace:
+def get_argument_name_space() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--inputFiles",
@@ -52,7 +52,7 @@ def getArgumentNameSpace() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def getPositionsAndTime(
+def get_positions_and_time(
     file_paths: List[str],
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
     all_pos = {}
@@ -260,7 +260,7 @@ def flatten_first_entry(
 
 def main() -> None:
 
-    pos, time = getPositionsAndTime(getArgumentNameSpace().inputFiles)
+    pos, time = get_positions_and_time(get_argument_name_space().inputFiles)
 
     plotting(pos, time, show_plts)
 
