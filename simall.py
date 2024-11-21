@@ -1,16 +1,9 @@
 import subprocess
-from dataclasses import dataclass
 from os import getenv
 from pathlib import Path
 
+from det_mod_configs import get_paths_and_detector_configs
 from utils import construct_beamstrahlung_paths, get_path_for_current_machine
-
-
-@dataclass
-class DetectorConfig:
-    ddsimFile: Path
-    relativeCompactFilePath: Path
-
 
 # Define the variables
 executeBsub = False  # Boolean variable to switch between modes
@@ -37,8 +30,6 @@ isExecutedOnDESYNAF = "desy.de" in Path.home().parts
 codeDir = Path(getenv("myCodeDir"))
 beamStrahlungCodeDir = codeDir / "beamStrahlung"
 k4geoDir = codeDir / "k4geo"
-ild4FCCDir = Path("FCCee") / "ILD_FCCee" / "compact"
-ild4ILCDir = Path("ILD") / "compact" / "ILD_sl5_v02"
 if isExecutedOnDESYNAF:
     desyDustHomePath = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
     outDir = desyDustHomePath
@@ -48,38 +39,12 @@ else:
 outDir = outDir / "promotion" / "data" / versionName  # assumption
 bs_data_paths = construct_beamstrahlung_paths(desyDustHomePath, isExecutedOnDESYNAF)
 
-# define Paths to ddsim files
-ddsim4FCC = beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV_30mrad.py"
-ddsim4ILC = beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV.py"
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
 setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
 
 # Dict containing the detector model configurations
-detectorConfigs = {
-    "ILD_FCCee_v01": DetectorConfig(
-        ddsim4FCC, ild4FCCDir / "ILD_FCCee_v01/ILD_FCCee_v01.xml"
-    ),
-    "ILD_FCCee_v01_fields": DetectorConfig(
-        ddsim4FCC, ild4FCCDir / "ILD_FCCee_v01_fields/ILD_FCCee_v01_fields.xml"
-    ),
-    "ILD_FCCee_v01_fields_noMask": DetectorConfig(
-        ddsim4FCC,
-        ild4FCCDir / "ILD_FCCee_v01_fields_noMask/ILD_FCCee_v01_fields_noMask.xml",
-    ),
-    "ILD_FCCee_v02": DetectorConfig(
-        ddsim4FCC, ild4FCCDir / "ILD_FCCee_v02/ILD_FCCee_v02.xml"
-    ),
-    "ILD_l5_v02": DetectorConfig(
-        ddsim4ILC, ild4ILCDir / "ILD_l5_v02.xml"
-    ),  # uniform solenoid field
-    "ILD_l5_v03": DetectorConfig(
-        ddsim4ILC, ild4ILCDir / "ILD_l5_v03.xml"
-    ),  # realistic solenoid field
-    "ILD_l5_v05": DetectorConfig(
-        ddsim4ILC, ild4ILCDir / "ILD_l5_v05.xml"
-    ),  # realistic solenoid field & anti-DID field
-}
+det_mod_configs_dict = get_paths_and_detector_configs(beamStrahlungCodeDir)
 
 
 def replaceBXNumberInString(bsTypeName: str, bsPath: Path, bxN: int) -> str:
@@ -133,10 +98,12 @@ def main():
                 )
 
                 # Iterate over the detector models
-                for detModName, detModConfigs in detectorConfigs.items():
+                for detModName, detModConfigs in det_mod_configs_dict.items():
                     if detModName in detMods2Ana:
                         # Construct the compactFile name
-                        compactFile = k4geoDir / detModConfigs.relativeCompactFilePath
+                        compactFile = (
+                            k4geoDir / detModConfigs.relative_compact_file_path
+                        )
 
                         # Construct the output file names
                         outName = (
@@ -147,7 +114,7 @@ def main():
                         outputLogFileName = outName.with_suffix(".log")
 
                         # Construct the command
-                        command = f"ddsim --steeringFile {detModConfigs.ddsimFile} --compactFile {compactFile} --inputFile {bsPathWithBXNumber} --outputFile {outputFileName} --numberOfEvents {nEvents} --guineapig.particlesPerEvent {guineaPigPartPerE} > {outputLogFileName} 2>&1"
+                        command = f"ddsim --steeringFile {detModConfigs.ddsim_file} --compactFile {compactFile} --inputFile {bsPathWithBXNumber} --outputFile {outputFileName} --numberOfEvents {nEvents} --guineapig.particlesPerEvent {guineaPigPartPerE} > {outputLogFileName} 2>&1"
                         bsub_command = f'bsub -q l "{command}"'
 
                         # Execute or print the command depending on executeBsub
