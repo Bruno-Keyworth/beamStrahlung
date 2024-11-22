@@ -139,30 +139,27 @@ def construct_beamstrahlung_paths(
 
 def get_path_for_current_machine(path_dict: dict) -> Path:
     """
-    Retrieves the appropriate path based on the current machine's home directory.
+    Retrieves the appropriate path based on the current machine's identifier.
 
-    This function takes a dictionary `path_dict` where keys are expected
-    to be identifiers for different machines (or environments), and the values
-    are `Path` objects representing paths specific to those machines. It checks
-    the parts of the current user's home directory path to find a match with one of
-    the keys in `path_dict`.
+    This function utilizes the `identify_system` function to determine the current
+    machine's identifier and then retrieves the appropriate path from the given `path_dict`.
 
     Parameters:
-    path_dict (dict): A dictionary with machine/environment identifiers as keys
-                    and `Path` objects as values.
+    path_dict (dict): A dictionary with system identifiers as keys and `Path` objects as values.
 
     Returns:
     Path: The path corresponding to the current machine, as specified in `path_dict`.
 
     Raises:
-    KeyError: If none of the keys in `path_dict` are found in the current machine's
-            home directory path parts, indicating that the machine is unknown
-            or not configured in `path_dict`.
+    UnknownSystemError: If the system identifier returned by `identify_system()` does not
+                         match any key in `path_dict`, indicating that the machine is
+                         unknown or not configured.
     """
-    path_parts = Path.home().parts
-    for key in path_dict:
-        if key in path_parts:
-            return path_dict[key]
-    raise KeyError(
-        f"Machine unknown. One of the keys {list(path_dict)} has to be in {path_parts}."
+    system_key = identify_system()
+
+    if system_key in path_dict:
+        return path_dict[system_key]
+
+    raise UnknownSystemError(
+        f"Machine unknown. The system identifier '{system_key}' is not configured in the provided path dictionary."
     )
