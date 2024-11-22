@@ -1,9 +1,14 @@
 import subprocess
-from os import getenv
 from pathlib import Path
 
 from det_mod_configs import get_paths_and_detector_configs
 from utils import construct_beamstrahlung_paths, get_path_for_current_machine
+from platform_paths import (
+    identify_system,
+    desy_naf_machine_identifier,
+    desy_dust_home_path,
+    code_dir,
+)
 
 # Define the variables
 executeBsub = False  # Boolean variable to switch between modes
@@ -24,20 +29,14 @@ acceleratorConfigs2Ana = {"FCC091", "FCC240"}
 # detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
 # acceleratorConfigs2Ana = {"ILC250"}
 
-isExecutedOnDESYNAF = "desy.de" in Path.home().parts
+isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
 
 # define paths for later use
-codeDir = Path(getenv("myCodeDir"))
-beamStrahlungCodeDir = codeDir / "beamStrahlung"
-k4geoDir = codeDir / "k4geo"
-if isExecutedOnDESYNAF:
-    desyDustHomePath = Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
-    outDir = desyDustHomePath
-else:
-    desyDustHomePath = ""
-    outDir = Path.home()
+beamStrahlungCodeDir = code_dir / "beamStrahlung"
+k4geoDir = code_dir / "k4geo"
+outDir = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
 outDir = outDir / "promotion" / "data" / versionName  # assumption
-bs_data_paths = construct_beamstrahlung_paths(desyDustHomePath, isExecutedOnDESYNAF)
+bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
 
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)

@@ -4,8 +4,16 @@ username of the user executing the script. It utilizes a JSON configuration file
 usernames to system name. 
 """
 
-import os
 import json
+from os import getenv
+from pathlib import Path
+
+kek_machine_identifier = "kek"
+desy_naf_machine_identifier = "desy-naf"
+spectre_machine_identifier = "spectre"
+
+code_dir = Path(getenv("myCodeDir"))
+config_file_path = code_dir / "beamStrahlung" / "uname_to_sys_map.json"
 
 
 class UnknownSystemError(Exception):
@@ -30,7 +38,7 @@ def load_user_to_system_mapping(filepath: str) -> dict:
         return json.load(file)
 
 
-def identify_system(config_filepath: str) -> str:
+def identify_system() -> str:
     """
     Identifies the current system based on the username from environment variables
     and a configuration file mapping.
@@ -47,9 +55,9 @@ def identify_system(config_filepath: str) -> str:
         FileNotFoundError: If the specified configuration file does not exist.
         json.JSONDecodeError: If the file is not valid JSON.
     """
-    user_to_system = load_user_to_system_mapping(config_filepath)
+    user_to_system = load_user_to_system_mapping(config_file_path)
 
-    current_user = os.environ.get("USER")
+    current_user = getenv("USER")
 
     if current_user is None:
         raise UnknownSystemError("The USER environment variable is not set.")
@@ -58,3 +66,10 @@ def identify_system(config_filepath: str) -> str:
         raise UnknownSystemError(f"Unknown system for user: {current_user}")
 
     return user_to_system[current_user]
+
+
+desy_dust_home_path = (
+    Path("/nfs/dust/ilc/user/") / getenv("USER")
+    if identify_system() == desy_naf_machine_identifier
+    else None
+)

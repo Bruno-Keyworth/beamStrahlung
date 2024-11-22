@@ -8,6 +8,11 @@ from analyze_available_data import parse_files, print_detector_info, sort_detect
 from analyze_bs import plotting
 from caching import handle_cache_operations
 from simall import bs_data_paths
+from platform_paths import (
+    identify_system,
+    desy_naf_machine_identifier,
+    desy_dust_home_path,
+)
 
 show_plts = False
 DEFAULT_DETECTOR_MODELS = [
@@ -19,8 +24,8 @@ DEFAULT_SCENARIOS = ["FCC091", "FCC240", "ILC250"]  # Set your default scenarios
 
 
 def get_home_directory():
-    if "desy.de" in Path.home().parts:
-        return Path("/nfs/dust/ilc/user/") / Path.home().parts[-1]
+    if identify_system() == desy_naf_machine_identifier:
+        return desy_dust_home_path
     return Path.home()
 
 

@@ -3,6 +3,8 @@ from typing import Dict
 
 import numpy as np
 
+from platform_paths import desy_naf_machine_identifier, kek_machine_identifier
+
 
 def cartesian_to_spherical(cartesian: np.ndarray) -> np.ndarray:
     """
@@ -84,10 +86,6 @@ def construct_beamstrahlung_paths(
                     and the second key is machine_identifier. The value
                     is the path of the data file on the chosen machine.
     """
-
-    # must be part of the home dir path
-    kek_machine_identifier = "ilc"
-    desy_naf_machine_identifier = "desy.de"
 
     desy_dust_beamstrahlung_base_path = (
         desy_dust_home_path / "beamStrahlungDataFromDaniel"
