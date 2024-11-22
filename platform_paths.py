@@ -73,3 +73,9 @@ desy_dust_home_path = (
     if identify_system() == desy_naf_machine_identifier
     else None
 )
+
+
+def get_home_directory():
+    if identify_system() == desy_naf_machine_identifier:
+        return desy_dust_home_path
+    return Path.home()

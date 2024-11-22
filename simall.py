@@ -2,13 +2,13 @@ import subprocess
 from pathlib import Path
 
 from det_mod_configs import get_paths_and_detector_configs
-from utils import construct_beamstrahlung_paths, get_path_for_current_machine
 from platform_paths import (
-    identify_system,
-    desy_naf_machine_identifier,
-    desy_dust_home_path,
     code_dir,
+    desy_dust_home_path,
+    desy_naf_machine_identifier,
+    identify_system,
 )
+from utils import construct_beamstrahlung_paths, get_path_for_current_machine
 
 # Define the variables
 executeBsub = False  # Boolean variable to switch between modes
