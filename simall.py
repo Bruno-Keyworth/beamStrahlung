@@ -1,4 +1,3 @@
-import subprocess
 from pathlib import Path
 
 from det_mod_configs import get_paths_and_detector_configs
@@ -10,9 +9,10 @@ from platform_paths import (
     get_path_for_current_machine,
     identify_system,
 )
+from submit_utils_4_simall import submit_job
 
 # Define the variables
-executeBsub = False  # Boolean variable to switch between modes
+submit_jobs = False  # Boolean variable to switch between modes
 
 bunchCrossingEnd = 2
 nEvents = 5000
@@ -39,7 +39,6 @@ outDir = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
 outDir = outDir / "promotion" / "data" / versionName  # assumption
 bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
 
-
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
 setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
 
@@ -59,7 +58,7 @@ def replaceBXNumberInString(bsTypeName: str, bxN: int) -> str:
 
 def checkMaxBXNumberExceeded(bsTypeName: str, bunchCrossing: int) -> bool:
     """
-    check whether maximum number of bunch crossings per beam strahlung type is exceeded
+    Check whether maximum number of bunch crossings per beam strahlung type is exceeded.
     """
     if bsTypeName in {"FCC240", "FCC091"} and bunchCrossing > 100:
         print(
@@ -113,15 +112,33 @@ def main():
                     outputFileName = outName.with_suffix(".edm4hep.root")
                     outputLogFileName = outName.with_suffix(".log")
 
-                    # Construct the command
-                    command = f"ddsim --steeringFile {detModConfigs.ddsim_file} --compactFile {compactFile} --inputFile {bsPathWithBXNumber} --outputFile {outputFileName} --numberOfEvents {nEvents} --guineapig.particlesPerEvent {guineaPigPartPerE} > {outputLogFileName} 2>&1"
-                    bsub_command = f'bsub -q l "{command}"'
+                    # Define the executable and arguments separately
+                    executable = "ddsim"
+                    arguments = [
+                        "--steeringFile",
+                        str(detModConfigs.ddsim_file),
+                        "--compactFile",
+                        str(compactFile),
+                        "--inputFile",
+                        str(bsPathWithBXNumber),
+                        "--outputFile",
+                        str(outputFileName),
+                        "--numberOfEvents",
+                        str(nEvents),
+                        "--guineapig.particlesPerEvent",
+                        str(guineaPigPartPerE),
+                        ">",
+                        str(outputLogFileName),
+                        "2>&1",
+                    ]
 
-                    # Execute or print the command depending on executeBsub
-                    if executeBsub:
-                        subprocess.run(bsub_command, shell=True, check=True)
-                    else:
-                        print(bsub_command, end="\n\n")
+                    # Decide whether to use Condor or bsub
+                    batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
+
+                    # Submit the job using the appropriate batch system
+                    submit_job(
+                        batch_system, executable, arguments, outName, submit_jobs
+                    )
 
 
 if __name__ == "__main__":

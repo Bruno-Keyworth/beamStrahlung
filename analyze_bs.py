@@ -23,14 +23,20 @@ inputFileDefault = (
 
 # Define the dataclass
 @dataclass
-class Collection:
-    branch_name: str
-    plot_name: str
+class HitCollection:
+    root_tree_branch_name: str
+    plot_collection_prefix: str
 
 
 sub_det_cols = {
-    "vb": Collection(branch_name="VertexBarrelCollection", plot_name="Vertex Barrel"),
-    "ve": Collection(branch_name="VertexEndcapCollection", plot_name="Vertex Endcap"),
+    "vb": HitCollection(
+        root_tree_branch_name="VertexBarrelCollection",
+        plot_collection_prefix="Vertex Barrel",
+    ),
+    "ve": HitCollection(
+        root_tree_branch_name="VertexEndcapCollection",
+        plot_collection_prefix="Vertex Endcap",
+    ),
 }
 
 key_mapping = {
@@ -70,7 +76,9 @@ def get_positions_and_time(
         with uproot.open(file_path + ":events") as events:
             for sub_det_key, sub_det_name in sub_det_cols.items():
                 branch_base_name = (
-                    sub_det_name.branch_name + "/" + sub_det_name.branch_name
+                    sub_det_name.root_tree_branch_name
+                    + "/"
+                    + sub_det_name.root_tree_branch_name
                 )
                 iter_cols = iter(key_mapping)
                 pos_data = events.arrays(
@@ -142,10 +150,14 @@ def plotting(
     for sub_det_key, sub_det_name in sub_det_cols.items():
 
         if det_mod and scenario:
-            common_save_path = f"{sub_det_name.plot_name} {det_mod} {scenario}"
-            common_title = f"{sub_det_name.plot_name}  {det_mod}@{scenario}"
+            common_save_path = (
+                f"{sub_det_name.plot_collection_prefix} {det_mod} {scenario}"
+            )
+            common_title = (
+                f"{sub_det_name.plot_collection_prefix}  {det_mod}@{scenario}"
+            )
         else:
-            common_save_path = common_title = sub_det_name.plot_name
+            common_save_path = common_title = sub_det_name.plot_collection_prefix
 
         # Plot histogram of the z positions
         bp = BasePlotter(
