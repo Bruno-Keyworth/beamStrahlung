@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from det_mod_configs import get_paths_and_detector_configs
@@ -11,32 +12,71 @@ from platform_paths import (
 )
 from submit_utils_4_simall import submit_job
 
-# Define the variables
-submit_jobs = False  # Boolean variable to switch between modes
 
-bunchCrossingEnd = 2
-nEvents = 5000
-guineaPigPartPerE = -1
-versionName = "post_ecfa"
-# FCCee
-detMods2Ana = {
-    "ILD_FCCee_v01",
-    #    "ILD_FCCee_v01_fields",
-    #    "ILD_FCCee_v01_fields_noMask",
-    #    "ILD_FCCee_v02",
-}
-acceleratorConfigs2Ana = {"FCC091", "FCC240"}
-# # ILC
-# detMods2Ana = {"ILD_l5_v02", "ILD_l5_v03", "ILD_l5_v05"}
-# acceleratorConfigs2Ana = {"ILC250"}
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Process simulation parameters for FCCee and ILC."
+    )
+
+    parser.add_argument(
+        "--bunchCrossingEnd",
+        type=int,
+        default=2,
+        help="End value for bunch crossing (default: 2)",
+    )
+
+    parser.add_argument(
+        "--nEvents",
+        type=int,
+        default=5000,
+        help="Number of events to simulate (default: 5000)",
+    )
+
+    parser.add_argument(
+        "--guineaPigPartPerE",
+        type=int,
+        default=-1,
+    )
+
+    parser.add_argument(
+        "--versionName", type=str, required=True, help="Version name for the simulation"
+    )
+
+    parser.add_argument(
+        "--detMods2Ana",
+        choices=[
+            "ILD_FCCee_v01",
+            "ILD_FCCee_v02",
+            "ILD_l5_v02",
+            "ILD_l5_v03",
+            "ILD_l5_v05",
+        ],
+        nargs="+",
+        default=["ILD_FCCee_v01"],
+        help="Detector models to analyze (choose one or more)",
+    )
+
+    parser.add_argument(
+        "--acceleratorConfigs2Ana",
+        choices=["FCC091", "FCC240", "ILC250"],
+        nargs="+",
+        default=["FCC091", "FCC240"],
+        help="Accelerator configurations to analyze (choose one or more)",
+    )
+
+    parser.add_argument(
+        "--submit_jobs", action="store_true", help="Submit jobs if this flag is set"
+    )
+
+    return parser.parse_args()
+
 
 isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
 
 # define paths for later use
 beamStrahlungCodeDir = code_dir / "beamStrahlung"
 k4geoDir = code_dir / "k4geo"
-outDir = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
-outDir = outDir / "promotion" / "data" / versionName  # assumption
+out_Dir_base_path = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
 bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
@@ -85,12 +125,14 @@ def main():
     # # Note: The setup script source cannot affect the Python environment, but we simulate it in case needed.
     # source_setup_script(setupScriptPath)  # This will not affect the Python environment
 
+    args = parse_arguments()
+    outDir = out_Dir_base_path / "promotion" / "data" / args.versionName  # assumption
     outDir.mkdir(parents=True, exist_ok=True)
 
     # Iterate over the beam strahlung scenarios
-    for bs_scenario_name in acceleratorConfigs2Ana:
+    for bs_scenario_name in args.acceleratorConfigs2Ana:
 
-        for bunchCrossing in range(1, bunchCrossingEnd + 1):
+        for bunchCrossing in range(1, args.bunchCrossingEnd + 1):
             if checkMaxBXNumberExceeded(bs_scenario_name, bunchCrossing):
                 break
 
@@ -100,14 +142,14 @@ def main():
 
             # Iterate over the detector models
             for detModName, detModConfigs in det_mod_configs_dict.items():
-                if detModName in detMods2Ana:
+                if detModName in args.detMods2Ana:
                     # Construct the compactFile name
                     compactFile = k4geoDir / detModConfigs.relative_compact_file_path
 
                     # Construct the output file names
                     outName = (
                         outDir
-                        / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{nEvents}"
+                        / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
                     )
                     outputFileName = outName.with_suffix(".edm4hep.root")
                     outputLogFileName = outName.with_suffix(".log")
@@ -124,9 +166,9 @@ def main():
                         "--outputFile",
                         str(outputFileName),
                         "--numberOfEvents",
-                        str(nEvents),
+                        str(args.nEvents),
                         "--guineapig.particlesPerEvent",
-                        str(guineaPigPartPerE),
+                        str(args.guineaPigPartPerE),
                         ">",
                         str(outputLogFileName),
                         "2>&1",
@@ -137,7 +179,7 @@ def main():
 
                     # Submit the job using the appropriate batch system
                     submit_job(
-                        batch_system, executable, arguments, outName, submit_jobs
+                        batch_system, executable, arguments, outName, args.submit_jobs
                     )
 
 
