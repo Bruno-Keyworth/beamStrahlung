@@ -1,14 +1,23 @@
 import subprocess
 
 
-def submit_job(system_type, executable, arguments, output_file_base_name, sub_jobs):
+def submit_job(
+    system_type,
+    arguments,
+    output_file_base_name,
+    sub_jobs,
+    bs_code_dir,
+    executable_4KEK=None,
+):
     """Prepare and submit a job using the chosen batch system."""
     if system_type == "condor":
         # Create the Condor submit script
+        exec_name = "condor_sub_exec.sh"
         condor_params = {
             "Universe": "vanilla",
-            "Executable": executable,
+            "Executable": exec_name,
             "Arguments": " ".join(arguments),
+            "transfer_input_files": bs_code_dir / exec_name,
             "Log": f"{output_file_base_name}.log",
             "Output": f"{output_file_base_name}.out",
             "Error": f"{output_file_base_name}.err",
@@ -31,7 +40,15 @@ def submit_job(system_type, executable, arguments, output_file_base_name, sub_jo
 
     else:
         # Use bsub submission (used at KEK)
-        bsub_command = f'bsub -q l "{executable} {" ".join(arguments)}"'
+        output_log_file_name_4KEK = output_file_base_name.with_suffix(".log")
+        arguments.extend(
+            [
+                ">",
+                str(output_log_file_name_4KEK),
+                "2>&1",
+            ]
+        )
+        bsub_command = f'bsub -q l "{executable_4KEK} {" ".join(arguments)}"'
         if sub_jobs:
             subprocess.run(bsub_command, shell=True, check=True)
         else:

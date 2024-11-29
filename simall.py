@@ -152,7 +152,6 @@ def main():
                         / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
                     )
                     outputFileName = outName.with_suffix(".edm4hep.root")
-                    outputLogFileName = outName.with_suffix(".log")
 
                     # Define the executable and arguments separately
                     executable = "ddsim"
@@ -169,9 +168,6 @@ def main():
                         str(args.nEvents),
                         "--guineapig.particlesPerEvent",
                         str(args.guineaPigPartPerE),
-                        ">",
-                        str(outputLogFileName),
-                        "2>&1",
                     ]
 
                     # Decide whether to use Condor or bsub
@@ -179,7 +175,12 @@ def main():
 
                     # Submit the job using the appropriate batch system
                     submit_job(
-                        batch_system, executable, arguments, outName, args.submit_jobs
+                        batch_system,
+                        arguments,
+                        outName,
+                        args.submit_jobs,
+                        beamStrahlungCodeDir,
+                        executable,
                     )
 
 
