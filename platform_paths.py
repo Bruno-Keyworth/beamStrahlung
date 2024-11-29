@@ -13,9 +13,9 @@ kek_machine_identifier = "kek"
 desy_naf_machine_identifier = "desy-naf"
 spectre_machine_identifier = "spectre"
 
-code_dir = Path(getenv("myCodeDir"))
-if not code_dir:
+if not getenv("myCodeDir"):
     raise EnvironmentError("Environment variable 'myCodeDir' is not set.")
+code_dir = Path(getenv("myCodeDir"))
 config_file_path = code_dir / "beamStrahlung" / "uname_to_sys_map.json"
 
 
