@@ -33,7 +33,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--mode",
-        required=True,
+        default="overview",
         choices=["overview", "analysis", "ana_all"],
         help="Mode of operation: overview, analysis, or ana_all",
     )
