@@ -29,7 +29,7 @@ def parse_arguments():
         "--directory",
         required=True,
         type=str,
-        help="Directory containing the detector model files",
+        help="Directory containing the data files; can be relative to the 'dtDir' env var",
     )
     parser.add_argument(
         "--mode",

@@ -1,7 +1,8 @@
 """
 This module provides functionality to identify the current system based on the
 username of the user executing the script. It utilizes a JSON configuration file to map
-usernames to system name. 
+usernames to system name.
+And further path utilities.
 """
 
 import json
@@ -13,9 +14,12 @@ kek_machine_identifier = "kek"
 desy_naf_machine_identifier = "desy-naf"
 spectre_machine_identifier = "spectre"
 
-if not getenv("myCodeDir"):
-    raise EnvironmentError("Environment variable 'myCodeDir' is not set.")
-code_dir = Path(getenv("myCodeDir"))
+my_code_dir_env_var_name = "myCodeDir"
+if not getenv(my_code_dir_env_var_name):
+    raise EnvironmentError(
+        f"Environment variable '{my_code_dir_env_var_name}' is not set."
+    )
+code_dir = Path(getenv(my_code_dir_env_var_name))
 config_file_path = code_dir / "beamStrahlung" / "uname_to_sys_map.json"
 
 
@@ -95,7 +99,7 @@ def construct_beamstrahlung_paths(
     """
 
     desy_dust_beamstrahlung_base_path = (
-        desy_dust_home_path / "beamStrahlungDataFromDaniel"
+        desy_dust_home_path / "promotion" / "data" / "beamStrahlungDataFromDaniel"
         if is_executed_on_desy_naf
         else ""
     )
@@ -165,3 +169,41 @@ def get_path_for_current_machine(path_dict: dict) -> Path:
     raise UnknownSystemError(
         f"Machine unknown. The system identifier '{system_key}' is not configured in the provided path dictionary."
     )
+
+
+def resolve_path_with_env(input_path: str, env_var_name: str) -> Path:
+    """
+    Returns an absolute Path object by combining a given path with a specified environment variable if necessary.
+
+    This function checks whether the given path is absolute. If it is absolute, it returns the path as a Path object.
+    If the path is not absolute, the function checks for the presence of the specified environment variable. If the
+    environment variable is set, the function combines its value with the given relative path and returns the
+    resulting absolute Path object. If the environment variable is not set, an EnvironmentError is raised.
+
+    Parameters:
+    - input_path (str): The input path string to be processed.
+    - env_var_name (str): The name of the environment variable to be used for constructing the absolute path if
+      the input path is not absolute.
+
+    Returns:
+    - Path: An absolute Path object representing the combined path.
+
+    Raises:
+    - EnvironmentError: If the input path is not absolute and the specified environment variable is not set.
+    """
+
+    path = Path(input_path)
+
+    # Check if the input path is already absolute
+    if path.is_absolute():
+        return path
+
+    # Check if the specified environment variable is set
+    env_var_value = getenv(env_var_name)
+
+    if env_var_value is None:
+        raise EnvironmentError(f"The environment variable '{env_var_name}' is not set.")
+
+    # Combine the environment variable value with the provided path
+    combined_path = Path(env_var_value) / path
+    return combined_path

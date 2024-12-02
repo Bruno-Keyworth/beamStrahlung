@@ -1,8 +1,3 @@
-import argparse
-from pathlib import Path
-from collections import defaultdict
-from tabulate import tabulate
-
 """
 This script analyzes detector model files following a specific naming convention.
 
@@ -20,6 +15,13 @@ Arguments:
     <directory>  Path to the directory containing the detector model files.
 """
 
+import argparse
+from pathlib import Path
+from collections import defaultdict
+from tabulate import tabulate
+from platform_paths import resolve_path_with_env
+
+
 def parse_files(directory):
     """
     Parse the specified directory for files that match the expected naming format.
@@ -34,6 +36,8 @@ def parse_files(directory):
     defaultdict: A nested dictionary containing detector models as keys,
                  scenarios as subkeys, and sets of bX numbers as values.
     """
+    directory = resolve_path_with_env(directory, "dtDir")
+
     detector_data = defaultdict(lambda: defaultdict(set))
 
     # Iterate over all .edm4hep.root files in the provided directory
@@ -71,7 +75,7 @@ def sort_detector_data(detector_data):
     # Sort the detector models
     for detector_model in sorted(detector_data.keys()):
         scenarios = detector_data[detector_model]
-        
+
         # Sort scenarios for the current detector model
         for scenario in sorted(scenarios.keys()):
             bX_numbers = sorted(scenarios[scenario])  # Sort bX_numbers
