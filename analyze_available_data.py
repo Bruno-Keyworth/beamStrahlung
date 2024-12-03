@@ -19,7 +19,6 @@ import argparse
 from pathlib import Path
 from collections import defaultdict
 from tabulate import tabulate
-from platform_paths import resolve_path_with_env
 
 
 def parse_files(directory):
@@ -36,7 +35,6 @@ def parse_files(directory):
     defaultdict: A nested dictionary containing detector models as keys,
                  scenarios as subkeys, and sets of bX numbers as values.
     """
-    directory = resolve_path_with_env(directory, "dtDir")
 
     detector_data = defaultdict(lambda: defaultdict(set))
 

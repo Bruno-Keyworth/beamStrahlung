@@ -9,6 +9,7 @@ from analyze_bs import plotting
 from caching import handle_cache_operations
 from platform_paths import get_home_directory
 from simall import bs_data_paths
+from platform_paths import resolve_path_with_env
 
 show_plts = False
 DEFAULT_DETECTOR_MODELS = [
@@ -124,8 +125,10 @@ def main():
 
     args = parse_arguments()
 
+    directory = resolve_path_with_env(args.directory, "dtDir")
+
     # Parse the files to gather detector data
-    detector_data = parse_files(args.directory)
+    detector_data = parse_files(directory)
 
     if args.mode == "overview":
         print_detector_info(detector_data)
@@ -138,15 +141,13 @@ def main():
             if detector_model in detector_data:
                 for scenario in scenarios:
                     if scenario in detector_data[detector_model]:
-                        analyze_combination(
-                            args.directory, detector_model, scenario, args
-                        )
+                        analyze_combination(directory, detector_model, scenario, args)
 
     elif args.mode == "ana_all":
         # Analyze all combinations of detector models and scenarios
         for detector_model in sorted(detector_data.keys()):
             for scenario in sorted(detector_data[detector_model].keys()):
-                analyze_combination(args.directory, detector_model, scenario, args)
+                analyze_combination(directory, detector_model, scenario, args)
 
 
 if __name__ == "__main__":
