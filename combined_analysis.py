@@ -27,6 +27,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--directory",
+        "-d",
         required=True,
         type=str,
         help="Directory containing the data files; can be relative to the 'dtDir' env var",

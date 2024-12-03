@@ -8,7 +8,7 @@
 
 3. Evaluate generate data
    `python combined_analysis.py --directory $HOME/promotion/data/ecfa --mode overview`
-   or `python combined_analysis.py --directory ecfa --mode overview` if `dtDir` env var is set
+   or `python combined_analysis.py -d ecfa --mode overview` if `dtDir` env var is set
 
    - in case of problems try: `python analyze_available_data.py -d $HOME/promotion/data/ecfa`
 
