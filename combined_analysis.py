@@ -7,17 +7,14 @@ from tabulate import tabulate
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
 from analyze_bs import plotting
 from caching import handle_cache_operations
-from platform_paths import get_home_directory
-from simall import bs_data_paths
-from platform_paths import resolve_path_with_env
+from det_mod_configs import (
+    CHOICES_DETECTOR_MODELS,
+    DEFAULT_DETECTOR_MODELS,
+)
+from platform_paths import get_home_directory, resolve_path_with_env
+from simall import CHOICES_SCENARIOS, DEFAULT_SCENARIOS
 
 show_plts = False
-DEFAULT_DETECTOR_MODELS = [
-    "ILD_FCCee_v01_fields",
-    "ILD_l5_v02",
-    # "ILD_FCCee_v02",
-]  # Set your default detector models
-DEFAULT_SCENARIOS = ["FCC091", "FCC240", "ILC250"]  # Set your default scenarios
 
 
 def parse_arguments():
@@ -27,6 +24,8 @@ def parse_arguments():
         description="Combined Analysis of Detector Model Files"
     )
     parser.add_argument(
+        "--versionName",
+        "-v",
         "--directory",
         "-d",
         required=True,
@@ -41,15 +40,18 @@ def parse_arguments():
     )
     parser.add_argument(
         "--detectorModel",
-        nargs="*",
+        choices=CHOICES_DETECTOR_MODELS,
+        nargs="+",
+        default=DEFAULT_DETECTOR_MODELS,
         type=str,
         help="Specify one or more detector models for analysis",
     )
     parser.add_argument(
         "--scenario",
-        nargs="*",
+        nargs="+",
         type=str,
-        choices=set(bs_data_paths),  # single source of truth
+        choices=CHOICES_SCENARIOS,
+        default=DEFAULT_SCENARIOS,
         help="Specify one or more scenarios for analysis",
     )
     parser.add_argument(
@@ -123,7 +125,6 @@ def analyze_combination(directory, detector_model, scenario, args):
 
 
 def main():
-
     args = parse_arguments()
 
     directory = resolve_path_with_env(args.directory, "dtDir")

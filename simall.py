@@ -1,7 +1,11 @@
 import argparse
 from pathlib import Path
 
-from det_mod_configs import get_paths_and_detector_configs
+from det_mod_configs import (
+    CHOICES_DETECTOR_MODELS,
+    DEFAULT_DETECTOR_MODELS,
+    get_paths_and_detector_configs,
+)
 from platform_paths import (
     code_dir,
     construct_beamstrahlung_paths,
@@ -11,6 +15,24 @@ from platform_paths import (
     identify_system,
 )
 from submit_utils_4_simall import submit_job
+
+isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
+
+# define paths for later use
+beamStrahlungCodeDir = code_dir / "beamStrahlung"
+k4geoDir = code_dir / "k4geo"
+out_Dir_base_path = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
+bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
+
+
+CHOICES_SCENARIOS = tuple(set(bs_data_paths))  # single source of truth
+DEFAULT_SCENARIOS = "FCC240"
+
+# Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
+setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
+
+# Dict containing the detector model configurations
+det_mod_configs_dict = get_paths_and_detector_configs(beamStrahlungCodeDir)
 
 
 def parse_arguments():
@@ -39,51 +61,34 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--versionName", type=str, required=True, help="Version name for the simulation"
+        "--versionName",
+        "-v",
+        type=str,
+        required=True,
+        help="Version name for the simulation",
     )
 
     parser.add_argument(
-        "--detMods2Ana",
-        choices=[
-            "ILD_FCCee_v01",
-            "ILD_FCCee_v02",
-            "ILD_l5_v02",
-            "ILD_l5_v03",
-            "ILD_l5_v05",
-        ],
+        "--detectorModel",
+        choices=CHOICES_DETECTOR_MODELS,
         nargs="+",
-        default=["ILD_FCCee_v01"],
+        default=DEFAULT_DETECTOR_MODELS,
         help="Detector models to analyze (choose one or more)",
     )
 
     parser.add_argument(
-        "--acceleratorConfigs2Ana",
-        choices=["FCC091", "FCC240", "ILC250"],
+        "--scenario",
+        choices=CHOICES_SCENARIOS,
         nargs="+",
-        default=["FCC091", "FCC240"],
+        default=DEFAULT_SCENARIOS,
         help="Accelerator configurations to analyze (choose one or more)",
     )
 
     parser.add_argument(
-        "--submit_jobs", action="store_true", help="Submit jobs if this flag is set"
+        "--submit_jobs", action="store_true", help="Submit job(s) if this flag is set"
     )
 
     return parser.parse_args()
-
-
-isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
-
-# define paths for later use
-beamStrahlungCodeDir = code_dir / "beamStrahlung"
-k4geoDir = code_dir / "k4geo"
-out_Dir_base_path = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
-bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
-
-# Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
-setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
-
-# Dict containing the detector model configurations
-det_mod_configs_dict = get_paths_and_detector_configs(beamStrahlungCodeDir)
 
 
 def replaceBXNumberInString(bsTypeName: str, bxN: int) -> str:
@@ -130,8 +135,7 @@ def main():
     outDir.mkdir(parents=True, exist_ok=True)
 
     # Iterate over the beam strahlung scenarios
-    for bs_scenario_name in args.acceleratorConfigs2Ana:
-
+    for bs_scenario_name in args.scenario:
         for bunchCrossing in range(1, args.bunchCrossingEnd + 1):
             if checkMaxBXNumberExceeded(bs_scenario_name, bunchCrossing):
                 break
@@ -142,7 +146,7 @@ def main():
 
             # Iterate over the detector models
             for detModName, detModConfigs in det_mod_configs_dict.items():
-                if detModName in args.detMods2Ana:
+                if detModName in args.detectorModel:
                     # Construct the compactFile name
                     compactFile = k4geoDir / detModConfigs.relative_compact_file_path
 

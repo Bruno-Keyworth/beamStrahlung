@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import uproot
 
-from vicbib import BasePlotter
 from utils import add_spherical_coordinates_in_place
+from vicbib import BasePlotter
 
 save_plots = False
 show_plts = True
@@ -107,7 +107,6 @@ def get_positions_and_time(
                 time_d[sub_det_key].append(time_data)
 
     for sub_det_key, file_list in pos.items():  # keys vb, ve
-
         all_pos[sub_det_key] = dict(
             (k, [d[k] for d in file_list]) for k in file_list[0]
         )
@@ -149,7 +148,6 @@ def plotting(
     limits = {"vb": 60, "ve": 105}  # Limit in mm for 'vb'  # Limit in mm for 've'
 
     for sub_det_key, sub_det_name in sub_det_cols.items():
-
         if det_mod and scenario:
             common_save_path = save_dir / (
                 f"{sub_det_name.plot_collection_prefix.replace(' ', '_')}_{det_mod}_{scenario}"
@@ -183,7 +181,6 @@ def plotting(
 
         # Plot histogram of the theta positions
         if make_theta_hist:
-
             add_spherical_coordinates_in_place(pos_dict[sub_det_key])
 
             bp = BasePlotter(
@@ -273,7 +270,7 @@ def plotting(
 
 
 def flatten_first_entry(
-    data: Union[Dict[str, np.ndarray], np.ndarray]
+    data: Union[Dict[str, np.ndarray], np.ndarray],
 ) -> Union[Dict[str, np.ndarray], np.ndarray]:
     """
     Replace each array of arrays with the first nested array.
@@ -305,7 +302,6 @@ def flatten_first_entry(
 
 
 def main() -> None:
-
     pos, time = get_positions_and_time(get_argument_name_space().inputFiles)
 
     plotting(pos, time, show_plts)

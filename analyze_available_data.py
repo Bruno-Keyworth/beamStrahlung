@@ -4,8 +4,8 @@ This script analyzes detector model files following a specific naming convention
 The expected file naming format is:
 DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
 
-The script scans a directory for files that match this format, organizes the 
-data by detector model and scenario, and counts the number of different 
+The script scans a directory for files that match this format, organizes the
+data by detector model and scenario, and counts the number of different
 bX_NUMBER files found for each scenario within each detector model.
 
 Usage:
@@ -16,8 +16,9 @@ Arguments:
 """
 
 import argparse
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
 from tabulate import tabulate
 
 

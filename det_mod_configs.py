@@ -7,6 +7,18 @@ contains detector model data:
 from dataclasses import dataclass
 from pathlib import Path
 
+CHOICES_DETECTOR_MODELS = tuple(
+    {
+        "ILD_FCCee_v01",
+        "ILD_FCCee_v01_fields",
+        "ILD_FCCee_v02",
+        "ILD_l5_v02",
+        "ILD_l5_v03",
+        "ILD_l5_v05",
+    }
+)
+DEFAULT_DETECTOR_MODELS = "ILD_FCCee_v01", "ILD_l5_v02"
+
 
 @dataclass
 class DetectorConfig:
