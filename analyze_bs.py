@@ -126,6 +126,7 @@ def plotting(
     num_bunch_crossings: int = 1,
     show_plots: bool = True,
     save_plots: bool = False,
+    save_dir: Path | str = None,
     make_theta_hist: bool = False,
     det_mod: str = "",
     scenario: str = "",
@@ -150,18 +151,22 @@ def plotting(
     for sub_det_key, sub_det_name in sub_det_cols.items():
 
         if det_mod and scenario:
-            common_save_path = (
-                f"{sub_det_name.plot_collection_prefix} {det_mod} {scenario}"
+            common_save_path = save_dir / (
+                f"{sub_det_name.plot_collection_prefix.replace(' ', '_')}_{det_mod}_{scenario}"
             )
             common_title = (
                 f"{sub_det_name.plot_collection_prefix}  {det_mod}@{scenario}"
             )
         else:
-            common_save_path = common_title = sub_det_name.plot_collection_prefix
+            common_title = sub_det_name.plot_collection_prefix
+            common_save_path = save_dir / common_title
+
+        save_dir.mkdir(exist_ok=True)
 
         # Plot histogram of the z positions
         bp = BasePlotter(
-            save_plots, common_save_path.replace(" ", "_") + "_z_positions"
+            save_plots,
+            common_save_path.with_stem(common_save_path.stem + "_z_positions"),
         )
         _, ax = bp.plot()
         ax.hist(
@@ -182,7 +187,8 @@ def plotting(
             add_spherical_coordinates_in_place(pos_dict[sub_det_key])
 
             bp = BasePlotter(
-                save_plots, common_save_path.replace(" ", "_") + "_theta_positions"
+                save_plots,
+                common_save_path.with_stem(common_save_path.stem + "_theta_positions"),
             )
             _, ax = bp.plot()
             ax.hist(
@@ -199,7 +205,9 @@ def plotting(
             bp.finish()
 
         # Plot histogram of the times using BasePlotter
-        bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_hit_times")
+        bp = BasePlotter(
+            save_plots, common_save_path.with_stem(common_save_path.stem + "_hit_times")
+        )
         _, ax = bp.plot()
         ax.hist(
             time_dict[sub_det_key],
@@ -218,7 +226,9 @@ def plotting(
         limit_value = limits.get(sub_det_key, None)
 
         # Plot 2D histogram of the x and y positions using BasePlotter
-        bp = BasePlotter(save_plots, common_save_path.replace(" ", "_") + "_xy_hist")
+        bp = BasePlotter(
+            save_plots, common_save_path.with_stem(common_save_path.stem + "_xy_hist")
+        )
         fig, ax = bp.plot()
 
         # Compute bin edges to calculate bin area

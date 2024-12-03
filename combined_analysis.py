@@ -115,6 +115,7 @@ def analyze_combination(directory, detector_model, scenario, args):
         num_bX,  # Pass the number of bunch crossings
         show_plts,
         save_plots=args.savePlots,
+        save_dir=directory / "bp_plots",
         make_theta_hist=True,
         scenario=scenario,
         det_mod=detector_model,

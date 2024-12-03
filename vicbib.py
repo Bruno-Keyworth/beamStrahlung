@@ -9,9 +9,6 @@ class BasePlotter:
     Provides basic plotting functionalities
     """
 
-    def set_save_path(self):
-        self.save_path = Path.home() / "promotion/data/bs_plots"
-
     def set_params(self) -> None:
         """
         sets basic plot settings
@@ -31,13 +28,12 @@ class BasePlotter:
         mpl.rcParams.update(self.params)
         # mpl.style.use("seaborn-colorblind")
 
-    def __init__(self, save=False, fig_name=None) -> None:
+    def __init__(self, save: bool = False, save_path: Path = None) -> None:
         self.save = save
         self.dpi = 251
-        self.fig_name = fig_name
+        self.save_path = save_path
         self.labelsize = 16
         self.set_params()
-        self.set_save_path()
 
     @staticmethod
     def plot():
@@ -54,9 +50,7 @@ class BasePlotter:
         # plt.tight_layout()
         # plt.tight_layout()
         if self.save:
-            plt.savefig(
-                Path(self.save_path) / self.fig_name, dpi=self.dpi
-            )  # , format="pdf"
+            plt.savefig(Path(self.save_path), dpi=self.dpi)  # , format="pdf"
         else:
             plt.show()
 
