@@ -127,7 +127,7 @@ def analyze_combination(directory, detector_model, scenario, args):
 def main():
     args = parse_arguments()
 
-    directory = resolve_path_with_env(args.directory, "dtDir")
+    directory = resolve_path_with_env(args.versionName, "dtDir")
 
     # Parse the files to gather detector data
     detector_data = parse_files(directory)

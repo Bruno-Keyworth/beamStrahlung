@@ -24,8 +24,8 @@ k4geoDir = code_dir / "k4geo"
 out_Dir_base_path = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
 bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
 
-
-CHOICES_SCENARIOS = tuple(set(bs_data_paths))  # single source of truth
+# single source of truth, keys of bs_data_paths become values of tuple
+CHOICES_SCENARIOS = tuple(bs_data_paths)
 DEFAULT_SCENARIOS = "FCC240"
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
