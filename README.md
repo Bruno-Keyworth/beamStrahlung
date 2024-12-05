@@ -3,8 +3,8 @@
 1. create env var `myCodeDir`
    its value needs to be the parent dir path of the k4geo and beamStrahlung repos (it is assumed that they are located in the same parent dir)
 
-2. `simall.py`
-   atm config is hard-coded :(
+2. Simulate particle propagation through detector and its response
+   `python simall.py -v test --detectorModel ILD_l5_v02 ILD_FCCee_v01 --scenario FCC240 FCC091 ILC250`
 
 3. Evaluate generate data
    `python combined_analysis.py --directory $HOME/promotion/data/test --mode overview`
