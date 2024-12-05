@@ -8,6 +8,7 @@ def submit_job(
     sub_jobs,
     bs_code_dir,
     executable_4KEK=None,
+    more_resources=False,
 ):
     """Prepare and submit a job using the chosen batch system."""
     if system_type == "condor":
@@ -22,6 +23,9 @@ def submit_job(
             "Output": f"{output_file_base_name}.out",
             "Error": f"{output_file_base_name}.err",
         }
+        if more_resources:
+            condor_params["request_memory"] = 32768
+            condor_params["request_runtime"] = 14400
 
         # Create the script content using the dictionary
         condor_script_content = (
