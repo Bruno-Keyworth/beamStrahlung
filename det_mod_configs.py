@@ -20,6 +20,20 @@ CHOICES_DETECTOR_MODELS = tuple(
 DEFAULT_DETECTOR_MODELS = "ILD_FCCee_v01", "ILD_l5_v02"
 
 
+# Define the dataclass
+@dataclass
+class HitCollection:
+    root_tree_branch_name: str
+    plot_collection_prefix: str
+
+
+@dataclass
+class AcceleratorConfig:
+    ddsim_file: Path
+    relative_compact_file_dir: Path
+    sim_crossing_angle_boost: float
+
+
 @dataclass
 class DetectorConfig:
     ddsim_file: Path
@@ -32,29 +46,48 @@ def get_paths_and_detector_configs(bs_code_dir: Path):
     ddsim4FCC = bs_code_dir / "ddsim_keep_microcurlers_10MeV_30mrad.py"
     ddsim4ILC = bs_code_dir / "ddsim_keep_microcurlers_10MeV.py"
 
-    det_mod_configs_dir_internal = {
-        "ILD_FCCee_v01": DetectorConfig(
-            ddsim4FCC, ild4FCC_dir / "ILD_FCCee_v01/ILD_FCCee_v01.xml"
-        ),
-        "ILD_FCCee_v01_fields": DetectorConfig(
-            ddsim4FCC, ild4FCC_dir / "ILD_FCCee_v01_fields/ILD_FCCee_v01_fields.xml"
-        ),
-        "ILD_FCCee_v01_fields_noMask": DetectorConfig(
-            ddsim4FCC,
-            ild4FCC_dir / "ILD_FCCee_v01_fields_noMask/ILD_FCCee_v01_fields_noMask.xml",
-        ),
-        "ILD_FCCee_v02": DetectorConfig(
-            ddsim4FCC, ild4FCC_dir / "ILD_FCCee_v02/ILD_FCCee_v02.xml"
-        ),
-        "ILD_l5_v02": DetectorConfig(
-            ddsim4ILC, ild4ILC_dir / "ILD_l5_v02.xml"
-        ),  # uniform solenoid field
-        "ILD_l5_v03": DetectorConfig(
-            ddsim4ILC, ild4ILC_dir / "ILD_l5_v03.xml"
-        ),  # realistic solenoid field
-        "ILD_l5_v05": DetectorConfig(
-            ddsim4ILC, ild4ILC_dir / "ILD_l5_v05.xml"
-        ),  # realistic solenoid field & anti-DID field
-    }
+
+accelerators = {
+    "FCCee": AcceleratorConfig(ddsim4FCC, ild4FCC_dir, 15.0e-3 * rad),
+    "ILC": AcceleratorConfig(ddsim4ILC, ild4ILC_dir, 7.0e-3 * rad),
+}
+
+
+sub_det_cols = {
+    "vb": HitCollection(
+        root_tree_branch_name="VertexBarrelCollection",
+        plot_collection_prefix="Vertex Barrel",
+    ),
+    "ve": HitCollection(
+        root_tree_branch_name="VertexEndcapCollection",
+        plot_collection_prefix="Vertex Endcap",
+    ),
+}
+
+
+detector_model_configurations = {
+    "ILD_FCCee_v01": DetectorConfig(
+        accelerators["FCCee"], "ILD_FCCee_v01/ILD_FCCee_v01.xml"
+    ),
+    "ILD_FCCee_v01_fields": DetectorConfig(
+        accelerators["FCCee"], "ILD_FCCee_v01_fields/ILD_FCCee_v01_fields.xml"
+    ),
+    "ILD_FCCee_v01_fields_noMask": DetectorConfig(
+        accelerators["FCCee"],
+        "ILD_FCCee_v01_fields_noMask/ILD_FCCee_v01_fields_noMask.xml",
+    ),
+    "ILD_FCCee_v02": DetectorConfig(
+        accelerators["FCCee"], "ILD_FCCee_v02/ILD_FCCee_v02.xml"
+    ),
+    "ILD_l5_v02": DetectorConfig(
+        accelerators["ILC"], "ILD_l5_v02.xml"
+    ),  # uniform solenoid field
+    "ILD_l5_v03": DetectorConfig(
+        accelerators["ILC"], "ILD_l5_v03.xml"
+    ),  # realistic solenoid field
+    "ILD_l5_v05": DetectorConfig(
+        accelerators["ILC"], "ILD_l5_v05.xml"
+    ),  # realistic solenoid field & anti-DID field
+}
 
     return det_mod_configs_dir_internal
