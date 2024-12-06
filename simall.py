@@ -166,7 +166,7 @@ def main():
                 executable = "ddsim"
                 arguments = [
                     "--steeringFile",
-                    str(beamStrahlungCodeDir / detModConfigs.get_ddsim_file_path()),
+                    str(beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV.py"),
                     "--compactFile",
                     str(k4geoDir / detModConfigs.get_compact_file_path()),
                     "--inputFile",

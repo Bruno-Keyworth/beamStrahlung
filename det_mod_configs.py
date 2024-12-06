@@ -32,7 +32,6 @@ class HitCollection:
 @dataclass
 class AcceleratorConfig:
     name: str
-    ddsim_file: Path
     relative_compact_file_dir: Path
     sim_crossing_angle_boost: float
 
@@ -48,9 +47,6 @@ class DetectorConfig:
             self.accelerator.relative_compact_file_dir / self.relative_compact_file_path
         )
 
-    def get_ddsim_file_path(self) -> Path:
-        return self.accelerator.ddsim_file
-
     def get_crossing_angle(self) -> float:
         return self.accelerator.sim_crossing_angle_boost
 
@@ -65,13 +61,11 @@ FCC_crossing_angle_boost = 15.0e-3
 ILC_crossing_angle_boost = 7.0e-3
 ild4FCC_dir = Path("FCCee") / "ILD_FCCee" / "compact"
 ild4ILC_dir = Path("ILD") / "compact" / "ILD_sl5_v02"
-ddsim4FCC = "ddsim_keep_microcurlers_10MeV_30mrad.py"
-ddsim4ILC = "ddsim_keep_microcurlers_10MeV.py"
 
 
 accelerators = {
-    "FCCee": AcceleratorConfig("FCCee", ddsim4FCC, ild4FCC_dir, 15.0e-3 * rad),
-    "ILC": AcceleratorConfig("ILC", ddsim4ILC, ild4ILC_dir, 7.0e-3 * rad),
+    "FCCee": AcceleratorConfig("FCCee", ild4FCC_dir, 15.0e-3 * rad),
+    "ILC": AcceleratorConfig("ILC", ild4ILC_dir, 7.0e-3 * rad),
 }
 
 
