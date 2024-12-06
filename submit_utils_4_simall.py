@@ -22,6 +22,7 @@ def submit_job(
             "Output": f"{output_file_base_name}.out",
             "Error": f"{output_file_base_name}.err",
         }
+        condor_params["request_memory"] = 4096
 
         # Create the script content using the dictionary
         condor_script_content = (
