@@ -27,7 +27,8 @@ def parse_files(directory):
     Parse the specified directory for files that match the expected naming format.
 
     The expected filename format is:
-    DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
+    DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root or
+    DETECTOR_MODEL_____-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
 
     Parameters:
     directory (str): The directory to scan for files.
@@ -47,7 +48,7 @@ def parse_files(directory):
         if len(parts) != 4:
             continue  # Skip any files that don't match the expected format
 
-        detector_model = parts[0]
+        detector_model = parts[0].rstrip("_")
         scenario = parts[1]
         bX_number = parts[2]
         e_number = parts[3].split("_")[-1]

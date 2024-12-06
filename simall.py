@@ -15,6 +15,7 @@ from platform_paths import (
     identify_system,
 )
 from submit_utils_4_simall import submit_job
+from utils import make_keys_uniform_length
 
 isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
 
@@ -134,6 +135,15 @@ def main():
     outDir = out_Dir_base_path / "promotion" / "data" / args.versionName  # assumption
     outDir.mkdir(parents=True, exist_ok=True)
 
+    det_mod_configs_dict_filtered = {
+        key: value
+        for key, value in det_mod_configs_dict.items()
+        if key in args.detectorModel
+    }
+    det_mod_configs_dict_filtered = make_keys_uniform_length(
+        det_mod_configs_dict_filtered
+    )
+
     # Iterate over the beam strahlung scenarios
     for bs_scenario_name in args.scenario:
         for bunchCrossing in range(1, args.bunchCrossingEnd + 1):
@@ -145,44 +155,43 @@ def main():
             )
 
             # Iterate over the detector models
-            for detModName, detModConfigs in det_mod_configs_dict.items():
-                if detModName in args.detectorModel:
+            for detModName, detModConfigs in det_mod_configs_dict_filtered.items():
 
-                    # Construct the output file names
-                    outName = (
-                        outDir
-                        / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
-                    )
+                # Construct the output file names
+                outName = (
+                    outDir
+                    / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
+                )
 
-                    # Define the executable and arguments separately
-                    executable = "ddsim"
-                    arguments = [
-                        "--steeringFile",
-                        str(beamStrahlungCodeDir / detModConfigs.get_ddsim_file_path()),
-                        "--compactFile",
-                        str(k4geoDir / detModConfigs.get_compact_file_path()),
-                        "--inputFile",
-                        str(bsPathWithBXNumber),
-                        "--outputFile",
-                        str(outName.with_suffix(".edm4hep.root")),
-                        "--numberOfEvents",
-                        str(args.nEvents),
-                        "--guineapig.particlesPerEvent",
-                        str(args.guineaPigPartPerE),
-                    ]
+                # Define the executable and arguments separately
+                executable = "ddsim"
+                arguments = [
+                    "--steeringFile",
+                    str(beamStrahlungCodeDir / detModConfigs.get_ddsim_file_path()),
+                    "--compactFile",
+                    str(k4geoDir / detModConfigs.get_compact_file_path()),
+                    "--inputFile",
+                    str(bsPathWithBXNumber),
+                    "--outputFile",
+                    str(outName.with_suffix(".edm4hep.root")),
+                    "--numberOfEvents",
+                    str(args.nEvents),
+                    "--guineapig.particlesPerEvent",
+                    str(args.guineaPigPartPerE),
+                ]
 
-                    # Decide whether to use Condor or bsub
-                    batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
+                # Decide whether to use Condor or bsub
+                batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
 
-                    # Submit the job using the appropriate batch system
-                    submit_job(
-                        batch_system,
-                        arguments,
-                        outName,
-                        args.submit_jobs,
-                        beamStrahlungCodeDir,
-                        executable,
-                    )
+                # Submit the job using the appropriate batch system
+                submit_job(
+                    batch_system,
+                    arguments,
+                    outName,
+                    args.submit_jobs,
+                    beamStrahlungCodeDir,
+                    executable,
+                )
 
 
 if __name__ == "__main__":

@@ -70,3 +70,24 @@ def add_spherical_coordinates_in_place(position_dict: dict) -> None:
     position_dict["r"] = spherical[:, 0]
     position_dict["theta"] = spherical[:, 1]
     position_dict["phi"] = spherical[:, 2]
+
+
+def make_keys_uniform_length(original_dict):
+    """
+    Adjusts all keys in the dictionary to have the same length by appending underscores.
+
+    Parameters:
+    - original_dict (dict): The dictionary with keys to be adjusted.
+
+    Returns:
+    - dict: A new dictionary with keys of uniform length.
+    """
+    # Find the length of the longest key
+    max_key_length = max(len(key) for key in original_dict)
+
+    # Create a new dictionary with keys of uniform length by appending underscores
+    uniform_keys_dict = {
+        key.ljust(max_key_length, "_"): value for key, value in original_dict.items()
+    }
+
+    return uniform_keys_dict
