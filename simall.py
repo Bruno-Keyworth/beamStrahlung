@@ -176,9 +176,28 @@ def main():
                     str(outName.with_suffix(".edm4hep.root")),
                     "--numberOfEvents",
                     str(args.nEvents),
-                    "--guineapig.particlesPerEvent",
-                    str(args.guineaPigPartPerE),
+                    "--crossingAngleBoost",
+                    str(detModConfigs.get_crossing_angle()),
                 ]
+
+                if detModConfigs.is_accelerator_ilc:
+                    # Determine particles per event value for "ILC" scenario
+                    particles_per_event = (
+                        str(args.guineaPigPartPerE)
+                        if 1 <= args.guineaPigPartPerE <= 5000
+                        else str(5000)
+                    )
+                else:
+                    # Use the provided particles per event for non-"ILC" scenarios
+                    particles_per_event = str(args.guineaPigPartPerE)
+
+                # Add particles per event argument
+                arguments.extend(
+                    [
+                        "--guineapig.particlesPerEvent",
+                        particles_per_event,
+                    ]
+                )
 
                 # Decide whether to use Condor or bsub
                 batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
