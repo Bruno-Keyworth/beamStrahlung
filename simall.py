@@ -176,7 +176,6 @@ def main():
 
                     # Decide whether to use Condor or bsub
                     batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
-                    more_rsrcs = "ILC" in bs_scenario_name
 
                     # Submit the job using the appropriate batch system
                     submit_job(
@@ -186,7 +185,6 @@ def main():
                         args.submit_jobs,
                         beamStrahlungCodeDir,
                         executable,
-                        more_resources=more_rsrcs,
                     )
 
 
