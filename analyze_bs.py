@@ -7,8 +7,8 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 import uproot
 
-from plotting import plotting
 from det_mod_configs import sub_det_cols
+from plotting import plotting
 
 save_plots = False
 show_plts = True

@@ -1,11 +1,12 @@
-import numpy as np
 from pathlib import Path
-import matplotlib.pyplot as plt
 from typing import Dict
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+from det_mod_configs import sub_det_cols
 from utils import add_spherical_coordinates_in_place
 from vicbib import BasePlotter
-from det_mod_configs import sub_det_cols
 
 
 def plotting(

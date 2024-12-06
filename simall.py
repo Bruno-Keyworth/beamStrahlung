@@ -156,7 +156,6 @@ def main():
 
             # Iterate over the detector models
             for detModName, detModConfigs in det_mod_configs_dict_filtered.items():
-
                 # Construct the output file names
                 outName = (
                     outDir

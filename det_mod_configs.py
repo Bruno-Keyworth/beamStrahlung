@@ -6,6 +6,7 @@ contains detector model data:
 
 from dataclasses import dataclass
 from pathlib import Path
+
 from g4units import rad
 
 CHOICES_DETECTOR_MODELS = tuple(
@@ -113,5 +114,4 @@ detector_model_configurations = {
 
 
 def get_paths_and_detector_configs():
-
     return detector_model_configurations
