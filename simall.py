@@ -32,7 +32,7 @@ DEFAULT_SCENARIOS = "FCC240"
 setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
 
 # Dict containing the detector model configurations
-det_mod_configs_dict = get_paths_and_detector_configs(beamStrahlungCodeDir)
+det_mod_configs_dict = get_paths_and_detector_configs()
 
 
 def parse_arguments():
@@ -147,27 +147,24 @@ def main():
             # Iterate over the detector models
             for detModName, detModConfigs in det_mod_configs_dict.items():
                 if detModName in args.detectorModel:
-                    # Construct the compactFile name
-                    compactFile = k4geoDir / detModConfigs.relative_compact_file_path
 
                     # Construct the output file names
                     outName = (
                         outDir
                         / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
                     )
-                    outputFileName = outName.with_suffix(".edm4hep.root")
 
                     # Define the executable and arguments separately
                     executable = "ddsim"
                     arguments = [
                         "--steeringFile",
-                        str(detModConfigs.ddsim_file),
+                        str(beamStrahlungCodeDir / detModConfigs.get_ddsim_file_path()),
                         "--compactFile",
-                        str(compactFile),
+                        str(k4geoDir / detModConfigs.get_compact_file_path()),
                         "--inputFile",
                         str(bsPathWithBXNumber),
                         "--outputFile",
-                        str(outputFileName),
+                        str(outName.with_suffix(".edm4hep.root")),
                         "--numberOfEvents",
                         str(args.nEvents),
                         "--guineapig.particlesPerEvent",
