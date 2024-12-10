@@ -2,7 +2,8 @@
 This script analyzes detector model files following a specific naming convention.
 
 The expected file naming format is:
-DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
+DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root or
+DETECTOR_MODEL_____-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root
 
 The script scans a directory for files that match this format, organizes the
 data by detector model and scenario, and counts the number of different
