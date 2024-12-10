@@ -69,7 +69,7 @@ accelerators = {
 }
 
 
-sub_det_cols = {
+sub_detector_collections = {
     "vb": HitCollection(
         root_tree_branch_name="VertexBarrelCollection",
         plot_collection_prefix="Vertex Barrel",

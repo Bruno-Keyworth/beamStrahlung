@@ -4,7 +4,7 @@ from typing import Dict
 import matplotlib.pyplot as plt
 import numpy as np
 
-from det_mod_configs import sub_det_cols
+from det_mod_configs import sub_detector_collections
 from utils import add_spherical_coordinates_in_place
 from vicbib import BasePlotter
 
@@ -37,7 +37,7 @@ def plotting(
     # Define the limits in millimeters for specific sub-detector keys
     limits = {"vb": 60, "ve": 105}  # Limit in mm for 'vb'  # Limit in mm for 've'
 
-    for sub_det_key, sub_det_name in sub_det_cols.items():
+    for sub_det_key, sub_det_name in sub_detector_collections.items():
         if det_mod and scenario:
             common_save_path = save_dir / (
                 f"{sub_det_name.plot_collection_prefix.replace(' ', '_')}_{det_mod}_{scenario}"

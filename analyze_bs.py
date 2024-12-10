@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 import uproot
 
-from det_mod_configs import sub_det_cols
+from det_mod_configs import sub_detector_collections
 from plotting import plotting
 
 save_plots = False
@@ -49,13 +49,13 @@ def get_positions_and_time(
     time_d = {}
 
     # Initialize the keys with empty lists to collect data from all files
-    for sub_det_key in sub_det_cols.keys():
+    for sub_det_key in sub_detector_collections.keys():
         pos[sub_det_key] = []
         time_d[sub_det_key] = []
 
     for file_path in file_paths:
         with uproot.open(file_path + ":events") as events:
-            for sub_det_key, sub_det_name in sub_det_cols.items():
+            for sub_det_key, sub_det_name in sub_detector_collections.items():
                 branch_base_name = (
                     sub_det_name.root_tree_branch_name
                     + "/"
