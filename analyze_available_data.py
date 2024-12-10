@@ -16,7 +16,6 @@ Arguments:
     <directory>  Path to the directory containing the detector model files.
 """
 
-import argparse
 from collections import defaultdict
 from pathlib import Path
 
@@ -114,40 +113,3 @@ def print_detector_info(sorted_detector_data):
             tablefmt="grid",
         )
     )
-
-
-def main():
-    """
-    Main function to execute the script.
-
-    It parses command line arguments, prints the expected filename format,
-    processes the files in the given directory, and displays the results in a table format.
-    """
-    parser = argparse.ArgumentParser(description="Analyze detector model files")
-    parser.add_argument(
-        "--directory",
-        "-d",
-        dest="directory",
-        type=str,
-        help="Directory containing the detector model files",
-    )
-
-    args = parser.parse_args()
-
-    # Print expected file naming format
-    print(
-        "Expected file naming format: DETECTOR_MODEL-SCENARIO-bX_NUMBER-nEvts_ENUMBER.edm4hep.root"
-    )
-
-    # Parse files to gather required information
-    detector_data = parse_files(args.directory)
-
-    # Sort the detector data
-    sorted_detector_data = sort_detector_data(detector_data)
-
-    # Print detector model info
-    print_detector_info(sorted_detector_data)
-
-
-if __name__ == "__main__":
-    main()

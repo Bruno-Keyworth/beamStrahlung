@@ -7,7 +7,6 @@ import numpy as np
 import uproot
 
 from det_mod_configs import detector_model_configurations
-from plotting import plotting
 
 save_plots = False
 show_plts = True
@@ -132,13 +131,3 @@ def flatten_first_entry(
         # Handle the case for numpy arrays like vbc_time if similar structure
         return data[0]
     return data
-
-
-def main() -> None:
-    pos, time = get_positions_and_time(get_argument_name_space().inputFiles)
-
-    plotting(pos, time, show_plts)
-
-
-if __name__ == "__main__":
-    main()
