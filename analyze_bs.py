@@ -1,5 +1,4 @@
 import argparse
-from dataclasses import dataclass
 from os import fspath
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -7,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 import uproot
 
-from det_mod_configs import sub_detector_collections
+from det_mod_configs import detector_model_configurations
 from plotting import plotting
 
 save_plots = False
@@ -41,7 +40,7 @@ def get_argument_name_space() -> argparse.Namespace:
 
 
 def get_positions_and_time(
-    file_paths: List[str],
+    file_paths: List[str], detector_model: str
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
     all_pos = {}
     all_time = {}
@@ -49,13 +48,16 @@ def get_positions_and_time(
     time_d = {}
 
     # Initialize the keys with empty lists to collect data from all files
-    for sub_det_key in sub_detector_collections.keys():
+    sub_det_cols = detector_model_configurations[
+        detector_model
+    ].get_sub_detector_collection_info()
+    for sub_det_key in sub_det_cols.keys():
         pos[sub_det_key] = []
         time_d[sub_det_key] = []
 
     for file_path in file_paths:
         with uproot.open(file_path + ":events") as events:
-            for sub_det_key, sub_det_name in sub_detector_collections.items():
+            for sub_det_key, sub_det_name in sub_det_cols.items():
                 branch_base_name = (
                     sub_det_name.root_tree_branch_name
                     + "/"

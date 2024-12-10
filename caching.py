@@ -59,7 +59,7 @@ def handle_cache_operations(
             f"Loaded data for Detector Model='{detector_model}', Scenario='{scenario}' from cache."
         )
     else:
-        pos, time = get_positions_and_time(file_paths)
+        pos, time = get_positions_and_time(file_paths, detector_model)
         save_to_cache(cache_file, (pos, time))
         print(
             f"Data loaded and cached for Detector Model='{detector_model}', Scenario='{scenario}'."

@@ -6,6 +6,7 @@ contains detector model data:
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict
 
 from g4units import rad
 
@@ -30,6 +31,7 @@ class AcceleratorConfig:
 class DetectorConfig:
     accelerator: AcceleratorConfig
     relative_compact_file_path: Path
+    sub_detector_collections: Dict
 
     def get_compact_file_path(self) -> Path:
         # Combine the directory from the accelerator with the relative compact file path
@@ -40,11 +42,14 @@ class DetectorConfig:
     def get_crossing_angle(self) -> float:
         return self.accelerator.sim_crossing_angle_boost
 
-    def is_accelerator_ilc(self) -> str:
+    def is_accelerator_ilc(self) -> bool:
         return self.accelerator.name == "ILC"
 
-    def is_accelerator_fccee(self) -> str:
+    def is_accelerator_fccee(self) -> bool:
         return self.accelerator.name == "FCCee"
+
+    def get_sub_detector_collection_info(self) -> Dict:
+        return self.sub_detector_collections
 
 
 FCC_crossing_angle_boost = 15.0e-3
@@ -59,7 +64,7 @@ accelerators = {
 }
 
 
-sub_detector_collections = {
+sub_det_cols_fcc = {
     "vb": HitCollection(
         root_tree_branch_name="VertexBarrelCollection",
         plot_collection_prefix="Vertex Barrel",
@@ -70,29 +75,51 @@ sub_detector_collections = {
     ),
 }
 
+sub_det_cols_ilc = {
+    "vb": HitCollection(
+        root_tree_branch_name="VXDCollection", plot_collection_prefix="Vertex"
+    ),
+    "f": HitCollection(
+        root_tree_branch_name="FTDCollection", plot_collection_prefix="Forward"
+    ),
+}
+
 
 detector_model_configurations = {
     "ILD_FCCee_v01": DetectorConfig(
-        accelerators["FCCee"], "ILD_FCCee_v01/ILD_FCCee_v01.xml"
+        accelerators["FCCee"],
+        "ILD_FCCee_v01/ILD_FCCee_v01.xml",
+        sub_det_cols_fcc,
     ),
     "ILD_FCCee_v01_fields": DetectorConfig(
-        accelerators["FCCee"], "ILD_FCCee_v01_fields/ILD_FCCee_v01_fields.xml"
+        accelerators["FCCee"],
+        "ILD_FCCee_v01_fields/ILD_FCCee_v01_fields.xml",
+        sub_det_cols_fcc,
     ),
     "ILD_FCCee_v01_fields_noMask": DetectorConfig(
         accelerators["FCCee"],
         "ILD_FCCee_v01_fields_noMask/ILD_FCCee_v01_fields_noMask.xml",
+        sub_det_cols_fcc,
     ),
     "ILD_FCCee_v02": DetectorConfig(
-        accelerators["FCCee"], "ILD_FCCee_v02/ILD_FCCee_v02.xml"
+        accelerators["FCCee"],
+        "ILD_FCCee_v02/ILD_FCCee_v02.xml",
+        sub_det_cols_fcc,
     ),
     "ILD_l5_v02": DetectorConfig(
-        accelerators["ILC"], "ILD_l5_v02.xml"
+        accelerators["ILC"],
+        "ILD_l5_v02.xml",
+        sub_det_cols_ilc,
     ),  # uniform solenoid field
     "ILD_l5_v03": DetectorConfig(
-        accelerators["ILC"], "ILD_l5_v03.xml"
+        accelerators["ILC"],
+        "ILD_l5_v03.xml",
+        sub_det_cols_ilc,
     ),  # realistic solenoid field
     "ILD_l5_v05": DetectorConfig(
-        accelerators["ILC"], "ILD_l5_v05.xml"
+        accelerators["ILC"],
+        "ILD_l5_v05.xml",
+        sub_det_cols_ilc,
     ),  # realistic solenoid field & anti-DID field
 }
 
