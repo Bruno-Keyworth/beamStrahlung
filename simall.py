@@ -13,6 +13,7 @@ from platform_paths import (
     desy_naf_machine_identifier,
     get_path_for_current_machine,
     identify_system,
+    sim_data_subdir_name,
 )
 from submit_utils_4_simall import submit_job
 from utils import make_keys_uniform_length
@@ -133,7 +134,11 @@ def main():
 
     args = parse_arguments()
     outDir = (
-        out_Dir_base_path / "promotion" / "data" / "sim" / args.versionName
+        out_Dir_base_path
+        / "promotion"
+        / "data"
+        / sim_data_subdir_name
+        / args.versionName
     )  # assumption
     outDir.mkdir(parents=True, exist_ok=True)
 

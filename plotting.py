@@ -39,7 +39,6 @@ def plotting(
 
     det = detector_model_configurations[det_mod]
     if det.is_accelerator_fccee():
-
         sub_det_cols = det.get_sub_detector_collection_info()
         for sub_det_key, sub_det_name in sub_det_cols.items():
             if det_mod and scenario:

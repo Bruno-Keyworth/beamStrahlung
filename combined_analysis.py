@@ -11,7 +11,11 @@ from det_mod_configs import (
     CHOICES_DETECTOR_MODELS,
     DEFAULT_DETECTOR_MODELS,
 )
-from platform_paths import get_home_directory, resolve_path_with_env
+from platform_paths import (
+    get_home_directory,
+    resolve_path_with_env,
+    sim_data_subdir_name,
+)
 from simall import CHOICES_SCENARIOS, DEFAULT_SCENARIOS
 
 show_plts = False
@@ -125,7 +129,9 @@ def main():
     args = parse_arguments()
 
     # if only version name provided, expanded the path based on 'dtDir' var
-    directory = resolve_path_with_env(Path("sim") / args.versionName, "dtDir")
+    directory = resolve_path_with_env(
+        Path(sim_data_subdir_name) / args.versionName, "dtDir"
+    )
 
     # Parse the files to gather detector data and sort the keys
     detector_data = sort_detector_data(parse_files(directory))

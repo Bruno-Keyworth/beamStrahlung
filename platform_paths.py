@@ -14,6 +14,7 @@ kek_machine_identifier = "kek"
 desy_naf_machine_identifier = "desy-naf"
 spectre_machine_identifier = "spectre"
 
+sim_data_subdir_name = "sim"
 my_code_dir_env_var_name = "myCodeDir"
 if not getenv(my_code_dir_env_var_name):
     raise EnvironmentError(
