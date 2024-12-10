@@ -147,8 +147,8 @@ def main():
 
     elif args.mode == "ana_all":
         # Analyze all combinations of detector models and scenarios
-        for detector_model in detector_data.keys():
-            for scenario in detector_data[detector_model].keys():
+        for detector_model, scenario_list in detector_data.items():
+            for scenario in scenario_list.keys():
                 analyze_combination(
                     directory, detector_model, scenario, detector_data, args
                 )
