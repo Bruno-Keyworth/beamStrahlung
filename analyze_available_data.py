@@ -96,7 +96,7 @@ def print_detector_info(sorted_detector_data):
     table_data = []
 
     # Prepare the table data
-    for detector_model in sorted(sorted_detector_data.keys()):
+    for detector_model in sorted_detector_data.keys():
         scenarios = sorted_detector_data[detector_model]
 
         # Iterate over the scenarios for the current detector model

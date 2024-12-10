@@ -67,11 +67,8 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def analyze_combination(directory, detector_model, scenario, args):
+def analyze_combination(directory, detector_model, scenario, detector_data, args):
     """Analyze a specific combination of detector model and scenario."""
-
-    # Sort detector data
-    detector_data = sort_detector_data(parse_files(directory))
 
     if (
         detector_model not in detector_data
@@ -127,10 +124,11 @@ def analyze_combination(directory, detector_model, scenario, args):
 def main():
     args = parse_arguments()
 
+    # if only version name provided, expanded the path based on 'dtDir' var
     directory = resolve_path_with_env(args.versionName, "dtDir")
 
-    # Parse the files to gather detector data
-    detector_data = parse_files(directory)
+    # Parse the files to gather detector data and sort the keys
+    detector_data = sort_detector_data(parse_files(directory))
 
     if args.mode == "overview":
         print_detector_info(detector_data)
@@ -143,13 +141,17 @@ def main():
             if detector_model in detector_data:
                 for scenario in scenarios:
                     if scenario in detector_data[detector_model]:
-                        analyze_combination(directory, detector_model, scenario, args)
+                        analyze_combination(
+                            directory, detector_model, scenario, detector_data, args
+                        )
 
     elif args.mode == "ana_all":
         # Analyze all combinations of detector models and scenarios
-        for detector_model in sorted(detector_data.keys()):
-            for scenario in sorted(detector_data[detector_model].keys()):
-                analyze_combination(directory, detector_model, scenario, args)
+        for detector_model in detector_data.keys():
+            for scenario in detector_data[detector_model].keys():
+                analyze_combination(
+                    directory, detector_model, scenario, detector_data, args
+                )
 
 
 if __name__ == "__main__":
