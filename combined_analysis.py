@@ -86,11 +86,11 @@ def analyze_combination(directory, detector_model, scenario, detector_data, args
 
     # Prepare file paths
     file_paths = [
-        fspath(
-            Path(directory)
-            / f"{detector_model}-{scenario}-{bX_identifier}-nEvts_5000.edm4hep.root"
-        )
+        fspath(p)
         for bX_identifier in bX_identifiers
+        for p in directory.glob(
+            f"{detector_model}-{scenario}-{bX_identifier}-nEvts_*.edm4hep.root"
+        )
     ]
 
     # Print current combination in a grid table format
