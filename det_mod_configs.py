@@ -9,16 +9,6 @@ from pathlib import Path
 
 from g4units import rad
 
-CHOICES_DETECTOR_MODELS = tuple(
-    {
-        "ILD_FCCee_v01",
-        "ILD_FCCee_v01_fields",
-        "ILD_FCCee_v02",
-        "ILD_l5_v02",
-        "ILD_l5_v03",
-        "ILD_l5_v05",
-    }
-)
 DEFAULT_DETECTOR_MODELS = "ILD_FCCee_v01", "ILD_l5_v02"
 
 
@@ -105,6 +95,8 @@ detector_model_configurations = {
         accelerators["ILC"], "ILD_l5_v05.xml"
     ),  # realistic solenoid field & anti-DID field
 }
+
+CHOICES_DETECTOR_MODELS = tuple(detector_model_configurations.keys())
 
 
 def get_paths_and_detector_configs():
