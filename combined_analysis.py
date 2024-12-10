@@ -125,7 +125,7 @@ def main():
     args = parse_arguments()
 
     # if only version name provided, expanded the path based on 'dtDir' var
-    directory = resolve_path_with_env(args.versionName, "dtDir")
+    directory = resolve_path_with_env(Path("sim") / args.versionName, "dtDir")
 
     # Parse the files to gather detector data and sort the keys
     detector_data = sort_detector_data(parse_files(directory))

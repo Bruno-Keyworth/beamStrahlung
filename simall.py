@@ -132,7 +132,9 @@ def main():
     # source_setup_script(setupScriptPath)  # This will not affect the Python environment
 
     args = parse_arguments()
-    outDir = out_Dir_base_path / "promotion" / "data" / args.versionName  # assumption
+    outDir = (
+        out_Dir_base_path / "promotion" / "data" / "sim" / args.versionName
+    )  # assumption
     outDir.mkdir(parents=True, exist_ok=True)
 
     det_mod_configs_dict_filtered = {

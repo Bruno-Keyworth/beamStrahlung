@@ -171,7 +171,7 @@ def get_path_for_current_machine(path_dict: dict) -> Path:
     )
 
 
-def resolve_path_with_env(input_path: str, env_var_name: str) -> Path:
+def resolve_path_with_env(input_path: str | Path, env_var_name: str) -> Path:
     """
     Returns an absolute Path object by combining a given path with a specified environment variable if necessary.
 
@@ -181,7 +181,7 @@ def resolve_path_with_env(input_path: str, env_var_name: str) -> Path:
     resulting absolute Path object. If the environment variable is not set, an EnvironmentError is raised.
 
     Parameters:
-    - input_path (str): The input path string to be processed.
+    - input_path (str or Path): The input path (string) to be processed.
     - env_var_name (str): The name of the environment variable to be used for constructing the absolute path if
       the input path is not absolute.
 
