@@ -123,6 +123,7 @@ def get_p_n_t(
             for key, value in my_key_mapping.items()
         }
 
+        # uproot.concatenate not used as depends on available/needed memory
         for batch in uproot.iterate(
             [{fp: "events"} for fp in file_paths],
             list(alis.keys()),
@@ -132,7 +133,24 @@ def get_p_n_t(
             for observable_key in alis.keys():
                 pos_n_t[sub_det_key][observable_key].append(batch[observable_key])
 
-    return pos_n_t
+    # Flattening the dict entries
+    for sub_det_key, observables in pos_n_t.items():
+        for observable_key, arrays in observables.items():
+            # Concatenate the arrays and flatten in case of multi-dimensional arrays
+            # 1. Concatenation: due to several files and list in defaultdict
+            concatenated_array = (
+                np.concatenate(arrays) if len(arrays) > 1 else arrays[0]
+            )
+            # 2. Concatenation: due to several events in a root file resulting in nested ndarrays
+            observables[observable_key] = (
+                np.concatenate(concatenated_array)
+                if isinstance(
+                    concatenated_array[0], np.ndarray
+                )  # testing only 0th entry should be fine as above concat. enforces same datatype
+                else concatenated_array
+            )
+
+    return dict(pos_n_t)
 
 
 def flatten_first_entry(
