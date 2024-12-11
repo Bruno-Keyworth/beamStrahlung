@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 from os import fspath
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -97,6 +98,41 @@ def get_positions_and_time(
         all_time[sub_det_key] = np.concatenate(time_d[sub_det_key])
 
     return all_pos, all_time
+
+
+def get_p_n_t(
+    file_paths: List[str], detector_model: str
+) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+
+    pos_n_t = defaultdict(lambda: defaultdict(list))
+
+    my_key_mapping = {
+        ".position.x": "x",
+        ".position.y": "y",
+        ".position.z": "z",
+        ".time": "t",
+    }
+
+    sub_det_cols = detector_model_configurations[
+        detector_model
+    ].get_sub_detector_collection_info()
+
+    for sub_det_key, hit_col in sub_det_cols.items():
+        alis = {
+            value: f"{hit_col.root_tree_branch_name}{key}"
+            for key, value in my_key_mapping.items()
+        }
+
+        for batch in uproot.iterate(
+            [{fp: "events"} for fp in file_paths],
+            list(alis.keys()),
+            library="np",
+            aliases=alis,
+        ):
+            for observable_key in alis.keys():
+                pos_n_t[sub_det_key][observable_key].append(batch[observable_key])
+
+    return pos_n_t
 
 
 def flatten_first_entry(

@@ -2,7 +2,7 @@ import pickle
 from pathlib import Path
 from typing import List, Tuple
 
-from analyze_bs import get_positions_and_time
+from analyze_bs import get_p_n_t, get_positions_and_time
 
 
 def get_cache_filename(cache_dir, detector_model, scenario, num_bX):
@@ -60,6 +60,7 @@ def handle_cache_operations(
         )
     else:
         pos, time = get_positions_and_time(file_paths, detector_model)
+        # pos_n_t = get_p_n_t(file_paths, detector_model)
         save_to_cache(cache_file, (pos, time))
         print(
             f"Data loaded and cached for Detector Model='{detector_model}', Scenario='{scenario}'."
