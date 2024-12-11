@@ -56,11 +56,9 @@ def get_positions_and_time(
 
     for file_path in file_paths:
         with uproot.open(file_path + ":events") as events:
-            for sub_det_key, sub_det_name in sub_det_cols.items():
+            for sub_det_key, hit_col in sub_det_cols.items():
                 branch_base_name = (
-                    sub_det_name.root_tree_branch_name
-                    + "/"
-                    + sub_det_name.root_tree_branch_name
+                    hit_col.root_tree_branch_name + "/" + hit_col.root_tree_branch_name
                 )
                 iter_cols = iter(key_mapping)
                 pos_data = events.arrays(
