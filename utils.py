@@ -1,3 +1,5 @@
+from typing import Dict, Tuple
+
 import numpy as np
 
 
@@ -91,3 +93,25 @@ def make_keys_uniform_length(original_dict):
     }
 
     return uniform_keys_dict
+
+
+def split_pos_n_time(
+    pos_n_time_dict: Dict[str, Dict[str, np.ndarray]],
+) -> Tuple[Dict[str, Dict[str, np.ndarray]], Dict[str, np.ndarray]]:
+    """
+    Splits combined position and time dict into separated position and
+    time dicts for easy legacy support
+
+    Parameters:
+    - pos_n_time_dict: first key is sub detector, second key is x,y,z,t
+
+    Returns:
+    - pos: first key is sub detector, second key is x,y,z
+    - time: key is sub detector
+    """
+    pos = {
+        k: {ke: va for ke, va in v.items() if ke != "t"}
+        for k, v in pos_n_time_dict.items()
+    }
+    time = {k: v["t"] for k, v in pos_n_time_dict.items()}
+    return pos, time
