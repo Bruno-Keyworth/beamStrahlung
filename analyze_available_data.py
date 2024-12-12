@@ -109,7 +109,7 @@ def print_detector_info(sorted_detector_data):
     print(
         tabulate(
             table_data,
-            headers=["Detector Model", "Scenario", "Different Number of Files"],
+            headers=["Detector Model", "Scenario", "Number of Files"],
             tablefmt="grid",
         )
     )
