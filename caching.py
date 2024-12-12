@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 from analyze_bs import get_p_n_t, get_positions_and_time
+from utils import split_pos_n_time
 
 
 def get_cache_filename(cache_dir, detector_model, scenario, num_bX):
@@ -59,8 +60,9 @@ def handle_cache_operations(
             f"Loaded data for Detector Model='{detector_model}', Scenario='{scenario}' from cache."
         )
     else:
-        pos, time = get_positions_and_time(file_paths, detector_model)
-        # pos_n_t = get_p_n_t(file_paths, detector_model)
+        # pos, time = get_positions_and_time(file_paths, detector_model)
+        # TODO split_pos_n_time only because of legacy reasons, remove
+        pos, time = split_pos_n_time(get_p_n_t(file_paths, detector_model))
         save_to_cache(cache_file, (pos, time))
         print(
             f"Data loaded and cached for Detector Model='{detector_model}', Scenario='{scenario}'."
