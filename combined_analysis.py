@@ -5,7 +5,6 @@ from pathlib import Path
 from tabulate import tabulate
 
 from analyze_available_data import parse_files, print_detector_info, sort_detector_data
-from analyze_bs import plotting
 from caching import handle_cache_operations
 from det_mod_configs import (
     CHOICES_DETECTOR_MODELS,
@@ -16,6 +15,7 @@ from platform_paths import (
     resolve_path_with_env,
     sim_data_subdir_name,
 )
+from plotting import plotting
 from simall import CHOICES_SCENARIOS, DEFAULT_SCENARIOS
 
 show_plts = False
