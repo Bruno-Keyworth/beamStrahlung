@@ -16,7 +16,6 @@ from platform_paths import (
     sim_data_subdir_name,
 )
 from submit_utils_4_simall import submit_job
-from utils import make_keys_uniform_length
 
 isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
 
@@ -147,9 +146,6 @@ def main():
         for key, value in det_mod_configs_dict.items()
         if key in args.detectorModel
     }
-    det_mod_configs_dict_filtered = make_keys_uniform_length(
-        det_mod_configs_dict_filtered
-    )
 
     # Iterate over the beam strahlung scenarios
     for bs_scenario_name in args.scenario:
