@@ -2,7 +2,7 @@ import argparse
 from collections import defaultdict
 from os import fspath
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
 import numpy as np
 import uproot
