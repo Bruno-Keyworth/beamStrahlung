@@ -27,7 +27,7 @@ bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnD
 
 # single source of truth, keys of bs_data_paths become values of tuple
 CHOICES_SCENARIOS = tuple(bs_data_paths)
-DEFAULT_SCENARIOS = "FCC240"
+DEFAULT_SCENARIOS = ("FCC240",)
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
 setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"

@@ -142,6 +142,7 @@ def main():
         # Determine which detector models and scenarios to analyze
         detector_models = args.detectorModel or DEFAULT_DETECTOR_MODELS
         scenarios = args.scenario or DEFAULT_SCENARIOS
+        assert not isinstance(detector_models, str) and not isinstance(scenarios, str)
 
         for detector_model in detector_models:
             if detector_model in detector_data:
