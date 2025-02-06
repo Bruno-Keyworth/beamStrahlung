@@ -149,6 +149,7 @@ def main():
 
     # Iterate over the beam strahlung scenarios
     for bs_scenario_name in args.scenario:
+        # loop over different files, bX is file index
         for bunchCrossing in range(1, args.bunchCrossingEnd + 1):
             if checkMaxBXNumberExceeded(bs_scenario_name, bunchCrossing):
                 break
