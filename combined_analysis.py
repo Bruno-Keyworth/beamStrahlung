@@ -29,7 +29,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--versionName",
-        "-v",
+        "-n",
         "--directory",
         "-d",
         required=True,
