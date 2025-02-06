@@ -35,7 +35,6 @@ def get_argument_name_space() -> argparse.Namespace:
 def get_p_n_t(
     file_paths: List[str], detector_model: str
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
-
     pos_n_t = defaultdict(lambda: defaultdict(list))
 
     key_mapping = {
