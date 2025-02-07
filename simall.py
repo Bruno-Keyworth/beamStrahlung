@@ -10,27 +10,29 @@ from platform_paths import (
     code_dir,
     construct_beamstrahlung_paths,
     desy_dust_home_path,
-    desy_naf_machine_identifier,
+    DESY_NAF_MACHINE_IDENTIFIER,
     get_path_for_current_machine,
     identify_system,
-    sim_data_subdir_name,
+    SIM_DATA_SUBDIR_NAME,
 )
 from submit_utils_4_simall import submit_job
 
-isExecutedOnDESYNAF = identify_system() == desy_naf_machine_identifier
+is_executed_on_DESY_NAF = identify_system() == DESY_NAF_MACHINE_IDENTIFIER
 
 # define paths for later use
-beamStrahlungCodeDir = code_dir / "beamStrahlung"
+beamstrahlung_code_dir = code_dir / "beamStrahlung"
 k4geoDir = code_dir / "k4geo"
-out_Dir_base_path = desy_dust_home_path if isExecutedOnDESYNAF else Path.home()
-bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, isExecutedOnDESYNAF)
+out_Dir_base_path = desy_dust_home_path if is_executed_on_DESY_NAF else Path.home()
+bs_data_paths = construct_beamstrahlung_paths(
+    desy_dust_home_path, is_executed_on_DESY_NAF
+)
 
 # single source of truth, keys of bs_data_paths become values of tuple
 CHOICES_SCENARIOS = tuple(bs_data_paths)
 DEFAULT_SCENARIOS = ("FCC240",)
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
-setupScriptPath = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
+SETUP_SCRIPT_PATH = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
 
 # Dict containing the detector model configurations
 det_mod_configs_dict = get_paths_and_detector_configs()
@@ -92,29 +94,29 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def replaceBXNumberInString(bsTypeName: str, bxN: int) -> str:
-    if bsTypeName == "ILC250":
-        return str(get_path_for_current_machine(bs_data_paths[bsTypeName])).replace(
-            "#N", str(bxN).zfill(4)
+def replace_BX_number_in_string(bs_type_name: str, BX_n: int) -> str:
+    if bs_type_name == "ILC250":
+        return str(get_path_for_current_machine(bs_data_paths[bs_type_name])).replace(
+            "#N", str(BX_n).zfill(4)
         )
-    return str(get_path_for_current_machine(bs_data_paths[bsTypeName])).replace(
-        "#N", str(bxN)
+    return str(get_path_for_current_machine(bs_data_paths[bs_type_name])).replace(
+        "#N", str(BX_n)
     )
 
 
-def checkMaxBXNumberExceeded(bsTypeName: str, bunchCrossing: int) -> bool:
+def check_max_BX_number_exceeded(bs_type_name: str, bunchcrossing: int) -> bool:
     """
     Check whether maximum number of bunch crossings per beam strahlung type is exceeded.
     """
-    if bsTypeName in {"FCC240", "FCC091"} and bunchCrossing > 100:
+    if bs_type_name in {"FCC240", "FCC091"} and bunchcrossing > 100:
         print(
-            f"\nThere are only 100 bunch crossing for {bsTypeName} available",
+            f"\nThere are only 100 bunch crossing for {bs_type_name} available",
             end="\n\n",
         )
         return True
-    if bsTypeName == "ILC250" and bunchCrossing > 1312:
+    if bs_type_name == "ILC250" and bunchcrossing > 1312:
         print(
-            f"\nThere are only 1312 bunch crossing for {bsTypeName} available",
+            f"\nThere are only 1312 bunch crossing for {bs_type_name} available",
             end="\n\n",
         )
         return True
@@ -132,14 +134,14 @@ def main():
     # source_setup_script(setupScriptPath)  # This will not affect the Python environment
 
     args = parse_arguments()
-    outDir = (
+    out_dir = (
         out_Dir_base_path
         / "promotion"
         / "data"
-        / sim_data_subdir_name
+        / SIM_DATA_SUBDIR_NAME
         / args.versionName
     )  # assumption
-    outDir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     det_mod_configs_dict_filtered = {
         key: value
@@ -150,40 +152,40 @@ def main():
     # Iterate over the beam strahlung scenarios
     for bs_scenario_name in args.scenario:
         # loop over different files, bX is file index
-        for bunchCrossing in range(1, args.bunchCrossingEnd + 1):
-            if checkMaxBXNumberExceeded(bs_scenario_name, bunchCrossing):
+        for bunchcrossing in range(1, args.bunchCrossingEnd + 1):
+            if check_max_BX_number_exceeded(bs_scenario_name, bunchcrossing):
                 break
 
-            bsPathWithBXNumber = replaceBXNumberInString(
-                bs_scenario_name, bunchCrossing
+            bs_path_with_BX_number = replace_BX_number_in_string(
+                bs_scenario_name, bunchcrossing
             )
 
             # Iterate over the detector models
-            for detModName, detModConfigs in det_mod_configs_dict_filtered.items():
+            for det_mod_name, det_mod_configs in det_mod_configs_dict_filtered.items():
                 # Construct the output file names
-                outName = (
-                    outDir
-                    / f"{detModName}-{bs_scenario_name}-bX_{str(bunchCrossing).zfill(4)}-nEvts_{args.nEvents}"
+                out_name = (
+                    out_dir
+                    / f"{det_mod_name}-{bs_scenario_name}-bX_{str(bunchcrossing).zfill(4)}-nEvts_{args.nEvents}"
                 )
 
                 # Define the executable and arguments separately
                 executable = "ddsim"
                 arguments = [
                     "--steeringFile",
-                    str(beamStrahlungCodeDir / "ddsim_keep_microcurlers_10MeV.py"),
+                    str(beamstrahlung_code_dir / "ddsim_keep_microcurlers_10MeV.py"),
                     "--compactFile",
-                    str(k4geoDir / detModConfigs.get_compact_file_path()),
+                    str(k4geoDir / det_mod_configs.get_compact_file_path()),
                     "--inputFile",
-                    str(bsPathWithBXNumber),
+                    str(bs_path_with_BX_number),
                     "--outputFile",
-                    str(outName.with_suffix(".edm4hep.root")),
+                    str(out_name.with_suffix(".edm4hep.root")),
                     "--numberOfEvents",
                     str(args.nEvents),
                     "--crossingAngleBoost",
-                    str(detModConfigs.get_crossing_angle()),
+                    str(det_mod_configs.get_crossing_angle()),
                 ]
 
-                if detModConfigs.is_accelerator_ilc:
+                if det_mod_configs.is_accelerator_ilc:
                     # Determine particles per event value for "ILC" scenario
                     particles_per_event = (
                         str(args.guineaPigPartPerE)
@@ -203,15 +205,15 @@ def main():
                 )
 
                 # Decide whether to use Condor or bsub
-                batch_system = "condor" if isExecutedOnDESYNAF else "bsub"
+                batch_system = "condor" if is_executed_on_DESY_NAF else "bsub"
 
                 # Submit the job using the appropriate batch system
                 submit_job(
                     batch_system,
                     arguments,
-                    outName,
+                    out_name,
                     args.submit_jobs,
-                    beamStrahlungCodeDir,
+                    beamstrahlung_code_dir,
                     executable,
                 )
 

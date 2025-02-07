@@ -10,17 +10,18 @@ from os import getenv
 from pathlib import Path
 from typing import Dict
 
-kek_machine_identifier = "kek"
-desy_naf_machine_identifier = "desy-naf"
-spectre_machine_identifier = "spectre"
+KEK_MACHINE_IDENTIFIER = "kek"
+DESY_NAF_MACHINE_IDENTIFIER = "desy-naf"
+SPECTRE_MACHINE_IDENTIFIER = "spectre"
 
-sim_data_subdir_name = "sim"
-my_code_dir_env_var_name = "myCodeDir"
-if not getenv(my_code_dir_env_var_name):
+SIM_DATA_SUBDIR_NAME = "sim"
+MY_CODE_DIR_ENV_VAR_NAME = "myCodeDir"
+
+if not getenv(MY_CODE_DIR_ENV_VAR_NAME):
     raise EnvironmentError(
-        f"Environment variable '{my_code_dir_env_var_name}' is not set."
+        f"Environment variable '{MY_CODE_DIR_ENV_VAR_NAME}' is not set."
     )
-code_dir = Path(getenv(my_code_dir_env_var_name))
+code_dir = Path(getenv(MY_CODE_DIR_ENV_VAR_NAME))
 config_file_path = code_dir / "beamStrahlung" / "uname_to_sys_map.json"
 
 
@@ -78,13 +79,13 @@ def identify_system() -> str:
 
 desy_dust_home_path = (
     Path("/nfs/dust/ilc/user/") / getenv("USER")
-    if identify_system() == desy_naf_machine_identifier
+    if identify_system() == DESY_NAF_MACHINE_IDENTIFIER
     else None
 )
 
 
 def get_home_directory():
-    if identify_system() == desy_naf_machine_identifier:
+    if identify_system() == DESY_NAF_MACHINE_IDENTIFIER:
         return desy_dust_home_path
     return Path.home()
 
@@ -107,10 +108,10 @@ def construct_beamstrahlung_paths(
 
     beam_strahlung_data_paths = {
         "ILC250": {
-            kek_machine_identifier: Path(
+            KEK_MACHINE_IDENTIFIER: Path(
                 "/group/ilc/users/jeans/pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
             ),
-            desy_naf_machine_identifier: (
+            DESY_NAF_MACHINE_IDENTIFIER: (
                 desy_dust_beamstrahlung_base_path
                 / "pairs-ILC250_gt2MeV/E250-SetA.PBeamstr-pairs.GGuineaPig-v1-4-4-gt2MeV.I270000.#N.pairs"
                 if desy_dust_beamstrahlung_base_path
@@ -118,10 +119,10 @@ def construct_beamstrahlung_paths(
             ),
         },
         "FCC091": {
-            kek_machine_identifier: Path(
+            KEK_MACHINE_IDENTIFIER: Path(
                 "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
             ),
-            desy_naf_machine_identifier: (
+            DESY_NAF_MACHINE_IDENTIFIER: (
                 desy_dust_beamstrahlung_base_path
                 / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs"
                 if desy_dust_beamstrahlung_base_path
@@ -129,10 +130,10 @@ def construct_beamstrahlung_paths(
             ),
         },
         "FCC240": {
-            kek_machine_identifier: Path(
+            KEK_MACHINE_IDENTIFIER: Path(
                 "/home/ilc/jeans/guineaPig/fromAndrea/pairs100/allAtIP_ZH/pairs-#N_ZH.pairs"
             ),
-            desy_naf_machine_identifier: (
+            DESY_NAF_MACHINE_IDENTIFIER: (
                 desy_dust_beamstrahlung_base_path
                 / "guineaPig_fromAndrea_pairs100_allAtIP-ZH/pairs-#N_ZH.pairs"
                 if desy_dust_beamstrahlung_base_path

@@ -13,7 +13,7 @@ from det_mod_configs import (
 from platform_paths import (
     get_home_directory,
     resolve_path_with_env,
-    sim_data_subdir_name,
+    SIM_DATA_SUBDIR_NAME,
 )
 from plotting import plotting
 from simall import CHOICES_SCENARIOS, DEFAULT_SCENARIOS
@@ -130,7 +130,7 @@ def main():
 
     # if only version name provided, expanded the path based on 'dtDir' var
     directory = resolve_path_with_env(
-        Path(sim_data_subdir_name) / args.versionName, "dtDir"
+        Path(SIM_DATA_SUBDIR_NAME) / args.versionName, "dtDir"
     )
 
     # Parse the files to gather detector data and sort the keys
