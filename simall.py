@@ -64,8 +64,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--versionName",
-        "-v",
+        "--version",
         type=str,
         required=True,
         help="Version name for the simulation",
@@ -139,7 +138,7 @@ def main():
         / "promotion"
         / "data"
         / SIM_DATA_SUBDIR_NAME
-        / args.versionName
+        / args.version
     )  # assumption
     out_dir.mkdir(parents=True, exist_ok=True)
 

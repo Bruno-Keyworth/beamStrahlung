@@ -28,13 +28,11 @@ def parse_arguments():
         description="Combined Analysis of Detector Model Files"
     )
     parser.add_argument(
-        "--versionName",
-        "-n",
+        "--version",
         "--directory",
-        "-d",
         required=True,
         type=str,
-        help="Directory containing the data files; can be relative to the 'dtDir' env var",
+        help="Version name / Directory containing the data files; can be relative to the 'dtDir' env var",
     )
     parser.add_argument(
         "--mode",
@@ -130,7 +128,7 @@ def main():
 
     # if only version name provided, expanded the path based on 'dtDir' var
     directory = resolve_path_with_env(
-        Path(SIM_DATA_SUBDIR_NAME) / args.versionName, "dtDir"
+        Path(SIM_DATA_SUBDIR_NAME) / args.version, "dtDir"
     )
 
     # Parse the files to gather detector data and sort the keys
