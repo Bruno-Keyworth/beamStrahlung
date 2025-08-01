@@ -134,11 +134,7 @@ def main():
 
     args = parse_arguments()
     out_dir = (
-        out_Dir_base_path
-        / "promotion"
-        / "data"
-        / SIM_DATA_SUBDIR_NAME
-        / args.version
+        out_Dir_base_path / "promotion" / "data" / SIM_DATA_SUBDIR_NAME / args.version
     )  # assumption
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -185,6 +181,8 @@ def main():
                 ]
 
                 if det_mod_configs.is_accelerator_ilc:
+                    # increased resources needed
+                    more_resources = True
                     # Determine particles per event value for "ILC" scenario
                     particles_per_event = (
                         str(args.guineaPigPartPerE)
@@ -214,6 +212,7 @@ def main():
                     args.submit_jobs,
                     beamstrahlung_code_dir,
                     executable,
+                    more_rscrs=more_resources,
                 )
 
 
