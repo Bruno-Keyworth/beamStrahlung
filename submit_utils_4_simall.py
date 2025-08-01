@@ -16,7 +16,7 @@ def submit_job(
         condor_params = {
             "Universe": "vanilla",
             "Executable": exec_name,
-            "Arguments": " ".join(arguments),
+            "Arguments": f'"{" ".join(arguments)}"',
             "transfer_input_files": bs_code_dir / exec_name,
             "Log": f"{output_file_base_name}.log",
             "Output": f"{output_file_base_name}.out",
