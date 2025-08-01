@@ -22,6 +22,7 @@ def submit_job(
             "Log": f"{output_file_base_name}.log",
             "Output": f"{output_file_base_name}.out",
             "Error": f"{output_file_base_name}.err",
+            "environment": '"k4gDir=$ENV(k4gDir)"',
         }
         if more_rscrs:
             condor_params["request_memory"] = 32768
