@@ -2,7 +2,7 @@
 
 ## 1. Create the environment variable `codeDir`
 
-Set `codeDir` to the path of the parent directory containing the `k4geo` and `beamStrahlung` repositories. These two repositories should be located in the same parent directory.
+Set the `codeDir` environment variable such that it points to the path of the parent directory containing the `k4geo` and `beamStrahlung` repositories. These two repositories should be located in the same parent directory.
 
 ## 2. Set up the machine identifier
 
