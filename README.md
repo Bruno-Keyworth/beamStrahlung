@@ -1,4 +1,8 @@
-# Very Brief How-To-Use
+# *BeamStrahlung* - Very Brief How-To-Use
+
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+Analyze the impact of (beam-induced) backgrounds on various detector models across different accelerators and center-of-mass energy settings 🔍
 
 ## 1. Create the environment variable `codeDir`
 
