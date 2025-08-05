@@ -1,16 +1,16 @@
 # Very Brief How-To-Use
 
-### 1. Create the environment variable `codeDir`:
+## 1. Create the environment variable `codeDir`
 
 Set `codeDir` to the path of the parent directory containing the `k4geo` and `beamStrahlung` repositories. These two repositories should be located in the same parent directory.
 
-### 2. Set up the machine identifier:
+## 2. Set up the machine identifier
 
 This code base is designed to run on different machines with various software configurations for interacting with high-throughput computing clusters (currently supporting `HTCondor` and `IBM Spectrum LSF`) and different directory structures. The system identifies the machine based on the user name.
 
 You need to create a file named `uname_to_sys_map.json`, where the key is your user name and the value is a so-called `MACHINE_IDENTIFIER`. Below are examples for the fictitious user A. Einstein:
 
-- **For DESY NAF** (user name: `einsteina`):
+- ### For DESY NAF (user name: `einsteina`)
 
   ```json
   {
@@ -18,7 +18,7 @@ You need to create a file named `uname_to_sys_map.json`, where the key is your u
   }
   ```
 
-- **For KEK** (user name: `einstein`):
+- ### For KEK (user name: `einstein`)
 
   ```json
   {
@@ -26,16 +26,18 @@ You need to create a file named `uname_to_sys_map.json`, where the key is your u
   }
   ```
 
-- **For both systems** (if you need both mappings):
+- ### For both systems (if you need both mappings)
+
   ```json
   {
     "einsteina": "desy-naf",
     "einstein": "kek"
   }
   ```
+
 - For more information, check out the `platform_paths.py` file.
 
-### 3. Tip:
+## 3. Tip
 
 You can always use the `--help` or `-h` flag to get more information about the available command-line arguments for the Python scripts:
 
@@ -43,7 +45,7 @@ You can always use the `--help` or `-h` flag to get more information about the a
 python simall.py --help
 ```
 
-### 4. Simulate particle propagation through the detector model(s) and its response:
+## 4. Simulate particle propagation through the detector model(s) and its response
 
 Run the following command to simulate the particle propagation:
 
@@ -51,7 +53,7 @@ Run the following command to simulate the particle propagation:
 python simall.py --version test --detectorModel ILD_l5_v02 ILD_FCCee_v01 --scenario FCC240 FCC091 ILC250
 ```
 
-### 5. Evaluate generated data:
+## 5. Evaluate generated data
 
 To evaluate the generated data, run one of the following commands:
 
@@ -67,7 +69,7 @@ To evaluate the generated data, run one of the following commands:
   python combined_analysis.py --directory $HOME/promotion/data/test --mode overview
   ```
 
-### 6. Perform the analysis:
+## 6. Perform the analysis
 
 To perform the analysis, use:
 
