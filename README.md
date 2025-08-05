@@ -37,6 +37,11 @@ You need to create a file named `uname_to_sys_map.json`, where the key is your u
 
 - For more information, check out the `platform_paths.py` file.
 
+- ### Important Notes on Cluster Interfaces
+
+  - The **HTCondor** interface has been actively used and tested in recent developments.
+  - The **IBM Spectrum LSF** interface (used at KEK) has not been tested recently and may require additional adjustments.
+
 ## 3. Tip
 
 You can always use the `--help` or `-h` flag to get more information about the available command-line arguments for the Python scripts:
@@ -76,8 +81,3 @@ To perform the analysis, use:
 ```bash
 python combined_analysis.py --version test --mode analysis
 ```
-
-### Important Notes on Cluster Interfaces:
-
-- The **HTCondor** interface has been actively used and tested in recent developments.
-- The **IBM Spectrum LSF** interface (used at KEK) has not been tested recently and may require additional adjustments.
