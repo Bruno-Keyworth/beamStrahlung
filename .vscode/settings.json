@@ -1,0 +1,13 @@
+{
+    "python.analysis.typeCheckingMode": "standard",
+    "pylint.enabled": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "notebook.defaultFormatter": "charliermarsh.ruff",
+    "ruff.organizeImports": true,
+    "editor.codeActionsOnSave": {
+        "source.unusedImports": "always",
+        "source.sort.json": "always",
+        "source.fixAll.ruff": "always"
+    }
+}
+
