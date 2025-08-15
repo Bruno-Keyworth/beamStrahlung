@@ -89,6 +89,81 @@ def get_home_directory():
         return desy_dust_home_path
     return Path.home()
 
+def construct_SR_paths(
+    desy_dust_home_path, is_executed_on_desy_naf
+) -> Dict[str, Dict[str, Path]]:
+    """
+    Returns:
+    Dict[str, Dict[str, Path]]: The first key is the background scenario
+                    and the second key is machine_identifier. The value
+                    is the path of the data file on the chosen machine.
+    """
+
+    desy_dust_SR_base_path = (
+        desy_dust_home_path / "promotion" / "data" / "split_up_SR_files"
+        if is_executed_on_desy_naf
+        else ""
+    )
+
+    sr_data_paths = {
+        "182GeVcom_nzco_10urad": {
+            KEK_MACHINE_IDENTIFIER: Path(
+                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+            ),
+            DESY_NAF_MACHINE_IDENTIFIER: (
+                desy_dust_SR_base_path
+                / "sr_photons_from_positron_182GeVcom_nzco_10urad_v23_mediumfilter/sr_photons_from_positron_182GeVcom_nzco_10urad_v23_mediumfilter_part_#N.hepevt"
+                if desy_dust_SR_base_path
+                else ""
+            ),
+        },
+        "182GeVcom_nzco_2urad": {
+            KEK_MACHINE_IDENTIFIER: Path(
+                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+            ),
+            DESY_NAF_MACHINE_IDENTIFIER: (
+                desy_dust_SR_base_path
+                / "sr_photons_from_positron_182GeVcom_nzco_2urad_v23_mediumfilter/sr_photons_from_positron_182GeVcom_nzco_2urad_v23_mediumfilter_part_#N.hepevt"
+                if desy_dust_SR_base_path
+                else ""
+            ),
+        },
+        "182GeVcom_nzco_6urad": {
+            KEK_MACHINE_IDENTIFIER: Path(
+                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+            ),
+            DESY_NAF_MACHINE_IDENTIFIER: (
+                desy_dust_SR_base_path
+                / "sr_photons_from_positron_182GeVcom_nzco_6urad_v23_mediumfilter/sr_photons_from_positron_182GeVcom_nzco_6urad_v23_mediumfilter_part_#N.hepevt"
+                if desy_dust_SR_base_path
+                else ""
+            ),
+        },
+        "20Mpositron_45GeVcom_halo": {
+            KEK_MACHINE_IDENTIFIER: Path(
+                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+            ),
+            DESY_NAF_MACHINE_IDENTIFIER: (
+                desy_dust_SR_base_path
+                / "sr_photons_from_20Mpositron_45GeVcom_halo_v23_mediumfilter/sr_photons_from_20Mpositron_45GeVcom_halo_v23_mediumfilter_part_#N.hepevt"
+                if desy_dust_SR_base_path
+                else ""
+            ),
+        },
+        "40Mpositron_45GeVcom_halo": {
+            KEK_MACHINE_IDENTIFIER: Path(
+                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
+            ),
+            DESY_NAF_MACHINE_IDENTIFIER: (
+                desy_dust_SR_base_path
+                / "sr_photons_from_40Mpositron_182GeVcom_halo_v23_mediumfilter/sr_photons_from_40Mpositron_182GeVcom_halo_v23_mediumfilter_part_#N.hepevt"
+                if desy_dust_SR_base_path
+                else ""
+            ),
+        },
+    }
+
+    return sr_data_paths
 
 def construct_beamstrahlung_paths(
     desy_dust_home_path, is_executed_on_desy_naf
@@ -119,9 +194,6 @@ def construct_beamstrahlung_paths(
             ),
         },
         "FCC091": {
-            KEK_MACHINE_IDENTIFIER: Path(
-                "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
-            ),
             DESY_NAF_MACHINE_IDENTIFIER: (
                 desy_dust_beamstrahlung_base_path
                 / "tpc-ion_tpc-bspairs_input-allatip/pairs-#N_Z.pairs"
@@ -143,6 +215,15 @@ def construct_beamstrahlung_paths(
     }
 
     return beam_strahlung_data_paths
+
+def construct_paths(
+    desy_dust_home_path, is_executed_on_desy_naf
+):  
+    bs_data_paths = construct_beamstrahlung_paths(desy_dust_home_path, is_executed_on_desy_naf)
+    sr_data_paths = construct_SR_paths(desy_dust_home_path, is_executed_on_desy_naf)
+
+    return bs_data_paths, sr_data_paths
+    
 
 
 def get_path_for_current_machine(path_dict: dict) -> Path:
