@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import os
+from glob import glob
 
 from det_mod_configs import (
     CHOICES_DETECTOR_MODELS,
@@ -23,13 +24,19 @@ is_executed_on_DESY_NAF = identify_system() == DESY_NAF_MACHINE_IDENTIFIER
 beamstrahlung_code_dir = code_dir / "beamStrahlung"
 k4geoDir = code_dir / "k4geo"
 out_Dir_base_path = desy_dust_home_path if is_executed_on_DESY_NAF else Path.home()
-bs_data_paths, sr_data_paths = construct_paths(
+bs_data_paths, sr_data_paths, file_extensions = construct_paths(
     desy_dust_home_path, is_executed_on_DESY_NAF
 )
 
 # single source of truth, keys of bs_data_paths become values of tuple
-CHOICES_SCENARIOS = tuple(sr_data_paths)
-DEFAULT_SCENARIOS = ("182GeVcom_nzco_10urad",)
+CHOICES_SCENARIOS = {
+    "synchrotron" : tuple(sr_data_paths),
+    "beamstrahlung" : tuple(bs_data_paths),
+}
+DEFAULT_SCENARIOS = {
+    "synchrotron" : ("10urad_nzco",),
+    "beamstrahlung" : ("FCC240",),
+}
 
 # Source the setup script (this will be a no-op in Python, since sourcing doesn't propagate in subprocess)
 SETUP_SCRIPT_PATH = "/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
@@ -73,8 +80,7 @@ def parse_arguments():
     parser.add_argument(
         "--background",
         type=str,
-        default="beamstrahlung",
-        choices=("beamstrahlung", "synchrotron"),
+        choices=CHOICES_SCENARIOS.keys(),
         help="Type of background data to read"
     )
 
@@ -88,9 +94,7 @@ def parse_arguments():
 
     parser.add_argument(
         "--scenario",
-        choices=CHOICES_SCENARIOS,
         nargs="+",
-        default=DEFAULT_SCENARIOS,
         help="Accelerator configurations to analyze (choose one or more)",
     )
 
@@ -99,6 +103,28 @@ def parse_arguments():
     )
 
     return parser.parse_args()
+
+def get_args(parse_args=parse_arguments):
+    args = parse_args()
+
+    if args.background is None:
+        if args.version in CHOICES_SCENARIOS:
+            args.background = args.version
+        else:
+            args.background = "beamstrahlung"
+
+    # Apply default if not specified
+    if args.scenario is None:
+        args.scenario = list(DEFAULT_SCENARIOS[args.background])
+
+    # Validate manually
+    valid_choices = CHOICES_SCENARIOS[args.background]
+    for sc in args.scenario:
+        if sc not in valid_choices:
+            print(f" Error: when background={args.background}, scenario must be one of {valid_choices}. Got '{sc}'")
+            args.scenario = list(DEFAULT_SCENARIOS[args.background])
+
+    return args
 
 
 def replace_BX_number_in_string(type_name: str, BX_n: int, background: str) -> str:
@@ -163,11 +189,12 @@ def main():
     # # Note: The setup script source cannot affect the Python environment, but we simulate it in case needed.
     # source_setup_script(setupScriptPath)  # This will not affect the Python environment
 
-    args = parse_arguments()
-    out_dir = (
+    print(is_executed_on_DESY_NAF)
+    args = get_args()
+    parent_out_dir = (
         out_Dir_base_path / "promotion" / "data" / SIM_DATA_SUBDIR_NAME / args.version
-    )  # assumption
-    out_dir.mkdir(parents=True, exist_ok=True)
+    ) 
+    parent_out_dir.mkdir(parents=True, exist_ok=True)
 
     det_mod_configs_dict_filtered = {
         key: value
@@ -176,84 +203,90 @@ def main():
     }
 
     # Iterate over the beam strahlung scenarios
-    for bs_scenario_name in args.scenario:
-
-        save_bX_count(bs_scenario_name, args.background, out_dir)
+    for scenario_name in args.scenario:
 
         # loop over different files, bX is file index
         for bunchcrossing in range(1, args.bunchCrossingEnd + 1):
 
-            bs_path_with_BX_number = replace_BX_number_in_string(
-                bs_scenario_name, bunchcrossing, args.background
+            folder_path_with_bX = replace_BX_number_in_string(
+                scenario_name, bunchcrossing, args.background
             )
-            if not os.path.exists(bs_path_with_BX_number):
+            print(folder_path_with_bX)
+            if not os.path.exists(folder_path_with_bX):
                 print(
-                    f"\nThere are only {bunchcrossing-1} files for {bs_scenario_name} available",
+                    f"\nThere are only {bunchcrossing-1} files for {scenario_name} available",
                     end="\n\n",
                 )
                 break
 
             # Iterate over the detector models
             for det_mod_name, det_mod_configs in det_mod_configs_dict_filtered.items():
-                # Construct the output file names
-                out_name = (
-                    out_dir
-                    / f"{det_mod_name}-{bs_scenario_name}-bX_{str(bunchcrossing).zfill(4)}-nEvts_{args.nEvents}"
-                )
+                out_dir = parent_out_dir / det_mod_name / f"{scenario_name}_{bunchcrossing}"
+                
+                out_dir.mkdir(parents=True, exist_ok=True)
 
-                print(bs_path_with_BX_number)
+                input_files = glob(os.path.join(folder_path_with_bX, f"*.{file_extensions[args.background]}"))
 
-                # Define the executable and arguments separately
-                executable = "ddsim"
-                arguments = [
-                    "--steeringFile",
-                    str(beamstrahlung_code_dir / "ddsim_keep_microcurlers_10MeV.py"),
-                    "--compactFile",
-                    str(k4geoDir / det_mod_configs.get_compact_file_path()),
-                    "--inputFile",
-                    str(bs_path_with_BX_number),
-                    "--outputFile",
-                    str(out_name.with_suffix(".edm4hep.root")),
-                    "--numberOfEvents",
-                    str(args.nEvents),
-                    "--crossingAngleBoost",
-                    str(det_mod_configs.get_crossing_angle()),
-                ]
+                for i, input_file_path in enumerate(input_files):
 
-                if det_mod_configs.is_accelerator_ilc:
-                    # increased resources needed
-                    more_resources = True
-                    # Determine particles per event value for "ILC" scenario
-                    particles_per_event = (
-                        str(args.guineaPigPartPerE)
-                        if 1 <= args.guineaPigPartPerE <= 5000
-                        else str(5000)
+                    # Construct the output file names
+                    out_name = (
+                        out_dir / f"{det_mod_name}-{scenario_name}-bX_{str(bunchcrossing).zfill(4)}-nEvts_{args.nEvents}-part_{i}"
                     )
-                else:
-                    # Use the provided particles per event for non-"ILC" scenarios
-                    particles_per_event = str(args.guineaPigPartPerE)
 
-                # Add particles per event argument
-                arguments.extend(
-                    [
-                        "--guineapig.particlesPerEvent",
-                        particles_per_event,
+                    print(folder_path_with_bX)
+
+                    # Define the executable and arguments separately
+                    executable = "ddsim"
+                    arguments = [
+                        "--steeringFile",
+                        str(beamstrahlung_code_dir / "ddsim_keep_microcurlers_10MeV.py"),
+                        "--compactFile",
+                        str(k4geoDir / det_mod_configs.get_compact_file_path()),
+                        "--inputFile",
+                        str(input_file_path),
+                        "--outputFile",
+                        str(out_name.with_suffix(".edm4hep.root")),
+                        "--numberOfEvents",
+                        str(args.nEvents),
+                        "--crossingAngleBoost",
+                        str(det_mod_configs.get_crossing_angle()),
                     ]
-                )
 
-                # Decide whether to use Condor or bsub
-                batch_system = "condor" if is_executed_on_DESY_NAF else "bsub"
+                    if det_mod_configs.is_accelerator_ilc:
+                        # increased resources needed
+                        more_resources = True
+                        # Determine particles per event value for "ILC" scenario
+                        particles_per_event = (
+                            str(args.guineaPigPartPerE)
+                            if 1 <= args.guineaPigPartPerE <= 5000
+                            else str(5000)
+                        )
+                    else:
+                        # Use the provided particles per event for non-"ILC" scenarios
+                        particles_per_event = str(args.guineaPigPartPerE)
 
-                # Submit the job using the appropriate batch system
-                submit_job(
-                    batch_system,
-                    arguments,
-                    out_name,
-                    args.submit_jobs,
-                    beamstrahlung_code_dir,
-                    executable,
-                    more_rscrs=more_resources,
-                )
+                    # Add particles per event argument
+                    arguments.extend(
+                        [
+                            "--guineapig.particlesPerEvent",
+                            particles_per_event,
+                        ]
+                    )
+
+                    # Decide whether to use Condor or bsub
+                    batch_system = "condor" if is_executed_on_DESY_NAF else "bsub"
+
+                    # Submit the job using the appropriate batch system
+                    submit_job(
+                        batch_system,
+                        arguments,
+                        out_name,
+                        args.submit_jobs,
+                        beamstrahlung_code_dir,
+                        executable,
+                        more_rscrs=more_resources,
+                    )
 
 
 if __name__ == "__main__":
