@@ -125,7 +125,7 @@ def analyze_combination(directory, detector_model, scenario, detector_data, args
     pos, time = handle_cache_operations(
         args.cacheDir, detector_model, scenario, num_bX, file_paths
     )
-        
+
     # Ensure the json_data directory exists
     json_data_dir = directory / "json_data"
     json_data_dir.mkdir(parents=True, exist_ok=True)
@@ -136,6 +136,7 @@ def analyze_combination(directory, detector_model, scenario, detector_data, args
 
     data_to_save = {
     "detector_model": detector_model,
+    "background": args.background,
     "scenario": scenario,
     "num_bunch_crossings": num_bX,
     "pos": convert_to_serializable(pos),

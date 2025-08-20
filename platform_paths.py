@@ -106,7 +106,7 @@ def construct_SR_paths(
     )
 
     sr_data_paths = {
-        "10urad_nzco": { # 182GeV COM
+        "182GeV_nzco_10urad": { # 182GeV COM
             KEK_MACHINE_IDENTIFIER: Path(
                 "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
             ),
@@ -117,7 +117,7 @@ def construct_SR_paths(
                 else ""
             ),
         },
-        "6urad_nzco": { # 182GeV COM
+        "182GeV_nzco_6urad": { # 182GeV COM
             KEK_MACHINE_IDENTIFIER: Path(
                 "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
             ),
@@ -128,7 +128,7 @@ def construct_SR_paths(
                 else ""
             ),
         },
-        "2urad_nzco": { # 182GeV COM
+        "182GeV_nzco_2urad": { # 182GeV COM
             KEK_MACHINE_IDENTIFIER: Path(
                 "/home/ilc/jeans/tpc-ion/tpc-bspairs/input_allatip/pairs-#N_Z.pairs"
             ),

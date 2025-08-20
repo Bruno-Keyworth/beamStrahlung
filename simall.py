@@ -34,7 +34,7 @@ CHOICES_SCENARIOS = {
     "beamstrahlung" : tuple(bs_data_paths),
 }
 DEFAULT_SCENARIOS = {
-    "synchrotron" : ("10urad_nzco",),
+    "synchrotron" : ("182GeV_nzco_10urad",),
     "beamstrahlung" : ("FCC240",),
 }
 
@@ -141,25 +141,6 @@ def replace_BX_number_in_string(type_name: str, BX_n: int, background: str) -> s
     return str(get_path_for_current_machine(data_paths[type_name])).replace(
         "#N", str(BX_n)
     )
-
-
-def check_max_BX_number_exceeded(bs_type_name: str, bunchcrossing: int) -> bool:
-    """
-    Check whether maximum number of bunch crossings per beam strahlung type is exceeded.
-    """
-    if bs_type_name in {"FCC240", "FCC091"} and bunchcrossing > 450:
-        print(
-            f"\nThere are only 100 bunch crossing for {bs_type_name} available",
-            end="\n\n",
-        )
-        return True
-    if bs_type_name == "ILC250" and bunchcrossing > 1312:
-        print(
-            f"\nThere are only 1312 bunch crossing for {bs_type_name} available",
-            end="\n\n",
-        )
-        return True
-    return False
 
 def save_bX_count(scenario, background, out_dir):
 
