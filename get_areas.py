@@ -4,7 +4,7 @@ from numpy import pi
 from det_mod_configs import sub_det_cols_fcc, sub_det_cols_ilc
 
 xmlPath = "../k4geo/FCCee/CLD/compact/CLD_o2_v07/Vertex_o4_v07_smallBP.xml"
-
+KEYWORDS = ["VertexEndcap_z", "VertexEndcap_rmax", "VertexBarrel_r", "VertexBarrel_zmax"]
 # Cannot find values stored in xml file for ILC model. This should be changed for single source of truth
 ILC_RADII = [16, 37, 58] # mm
 ILC_HALF_LENGTHS = [625, 1250, 1250]
@@ -22,7 +22,7 @@ def extract_value_in_mm(text):
     elif unit == "mm":
         return value   
 
-def extract_constants(xml_path, keywords):
+def extract_constants(xml_path=xmlPath, keywords=KEYWORDS):
     tree = ET.parse(xml_path)
     root = tree.getroot()
 
@@ -59,9 +59,7 @@ def calculate_barrel_area(radii, half_lengths, sub_det_cols):
     return total_area
 
 def get_areas():
-
-    keywords = ["VertexEndcap_z", "VertexEndcap_rmax", "VertexBarrel_r", "VertexBarrel_zmax"]
-    constants = extract_constants(xmlPath, keywords)
+    constants = extract_constants()
 
     fcc_barrel_area = calculate_barrel_area(constants["VertexBarrel_r"], constants["VertexBarrel_zmax"], sub_det_cols_fcc)
     fcc_endcap_area = pi * constants["VertexEndcap_rmax"][0]**2 * len(constants["VertexEndcap_z"]) * 2
@@ -82,4 +80,3 @@ def get_areas():
         } 
         }
     return subdetector_areas
-    

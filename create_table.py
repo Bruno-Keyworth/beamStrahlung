@@ -5,7 +5,7 @@ import argparse
 import os
 from pathlib import Path
 import pandas as pd
-from scale_hit_rate import scale_sr_hits
+from scale_hit_rate import scale_sr_hits, get_barrel_occupancy, get_endcap_occupancy
 
 subdetector_labels = {
     "vb": "vertex barrel",
@@ -23,6 +23,13 @@ def parse_arguments():
         required=True,
         type=str,
         help="Version name / Directory containing the json_data directory; can be relative to the 'dtDir' env var",
+    )
+    parser.add_argument(
+        "--unit",
+        type=str,
+        default="hit_rate",
+        choices=("hit_rate", "occupancy",),
+        help="The units the values in the table will be given in."
     )
     return parser.parse_args()
 
@@ -47,11 +54,17 @@ def extract_hits_per_bx(json_path):
     for subdet, pos_data in data["pos"].items():
         if subdet == 'f':
             continue
-        n_hits = len(pos_data["x"])
-        if background == "synchrotron":
-            n_hits = scale_sr_hits(n_hits, scenario)
         label = subdetector_labels.get(subdet, subdet)
-        hits_dict[label] = n_hits / num_bx / subdetector_areas[det_mod][subdet]
+        if args.unit == "hit_rate":
+            n_hits = len(pos_data["z"])
+            n_hits = scale_sr_hits(n_hits, scenario, background)
+            hits_dict[label] = n_hits / num_bx / subdetector_areas[det_mod][subdet]
+        elif subdet == "vb":
+            occupancy = get_barrel_occupancy(pos_data["z"], scenario, background, num_bx)
+            hits_dict[label] = occupancy
+        else:
+            occupancy = get_endcap_occupancy(pos_data["z"], scenario, background, num_bx)
+            hits_dict[label] = occupancy
 
     return det_mod, scenario, hits_dict
 
@@ -63,7 +76,7 @@ def create_table():
     for json_file in json_files:
         det_mod, scenario, hits = extract_hits_per_bx(json_file)
         for label, value in hits.items():
-            formated_value = f" {value:.10e}"
+            formated_value = f" {value:.2e}"
             rows.append({
                 "Detector Model": det_mod,
                 "Subdetector": label,

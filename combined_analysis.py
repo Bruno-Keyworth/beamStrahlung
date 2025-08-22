@@ -158,6 +158,7 @@ def analyze_combination(directory, detector_model, scenario, detector_data, args
         make_theta_hist=True,
         scenario=scenario,
         det_mod=detector_model,
+        background=args.background,
     )
 
 
