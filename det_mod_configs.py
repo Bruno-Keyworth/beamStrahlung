@@ -92,6 +92,11 @@ sub_det_cols_ilc = {
         root_tree_branch_name="FTDCollection", plot_collection_prefix="Forward",
         only_double_layers=True,
     ),
+    "tpc": HitCollection(
+        root_tree_branch_name="TPCLowPtCollection",
+        plot_collection_prefix="Time Projection Chamber",
+        only_double_layers=False,
+    )
 }
 
 
